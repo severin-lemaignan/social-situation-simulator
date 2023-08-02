@@ -1,8 +1,20 @@
 import sys
 
+import os
+
+# allow QML to access local file for read/save simulations
+os.environ["QML_XHR_ALLOW_FILE_READ"] = "1"
+os.environ["QML_XHR_ALLOW_FILE_WRITE"] = "1"
+
 from pathlib import Path
 from PySide6.QtQuick import QQuickView
-from PySide6.QtCore import QStringListModel, QUrl, Slot, QObject, QRegularExpression
+from PySide6.QtCore import (
+    Property,
+    Signal,
+    Slot,
+    QObject,
+    QRegularExpression,
+)
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine, QmlElement
 

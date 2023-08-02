@@ -17,8 +17,6 @@ Item {
 
     x: (x_m + origin_x) * m2px; y: (y_m + origin_y) * m2px
 
-    property double position: x_m+y_m // property that will change if either X or Y change, so that we can have a onPositionChanged callback
-
     property string color: "green"
 
     property double origin_x: 0
