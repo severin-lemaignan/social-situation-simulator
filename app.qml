@@ -1,14 +1,103 @@
 import QtQuick 2.14
-import QtQuick.Controls 2.12
-
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.1
+import QtQuick.Layouts 1.15
 
 ApplicationWindow {
     id: simulator
     width: 800
     height: 800
     visible: true
+    //Material.theme: Material.Dark
+    //Material.accent: Material.Red
 
     property double m2px: 100 // 100px = 1m
+
+
+    header: ToolBar {
+        RowLayout {
+            anchors.fill: parent
+            ToolButton {
+                text: qsTr("‹")
+                onClicked: stack.pop()
+            }
+            Label {
+                text: "Social Situation Simulator"
+                elide: Label.ElideRight
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+                Layout.fillWidth: true
+            }
+            Button {
+                id: btn_add_agent
+                text: "+"
+                highlighted: true
+                Material.accent: Material.Green
+                onClicked: {
+                    agents.addAgent()
+                }
+            }
+            ToolButton {
+                text: qsTr("⋮")
+                onClicked: menu.open()
+            }
+        }
+    }
+
+    footer: ToolBar{
+        RowLayout {
+            anchors.fill: parent
+            Slider {
+                id:timeline
+                x: 5
+                implicitWidth:parent.width - 10
+                width:implicitWidth
+                snapMode: Slider.SnapAlways
+                property int fps: 2
+                property int duration: 10 // sec
+                from:0
+                to: duration
+                stepSize: 1/fps
+                background: Item {
+                    x: parent.leftPadding + 13
+                    y: parent.topPadding + parent.availableHeight / 2
+                    width: parent.availableWidth - 26
+                    Repeater {
+                        model: timeline.duration + 1
+                        delegate: Column {
+                            x: index * parent.width / timeline.duration - width / 2
+                            y: 0
+                            spacing: 2
+                            Rectangle {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 2
+                                height: 4
+                                color: (index == 0 || index == timeline.duration) ? "transparent":Material.foreground
+                            }
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: index + "s"
+                                color: Material.foreground
+                            }
+                        }
+                    }
+                    Rectangle {
+                        y: -height / 2
+                        width: parent.width
+                        height: 4
+                        radius: 2
+                        color: Material.foreground
+                        Rectangle {
+                            width: timeline.visualPosition * parent.width
+                            height: parent.height +1
+                            radius:parent.radius
+                            color: Material.accent
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // draw the background grid
     Repeater {
