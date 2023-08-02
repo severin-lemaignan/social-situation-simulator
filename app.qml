@@ -118,51 +118,54 @@ ApplicationWindow {
     }
 
 
-    Agent {
-        x: 400; y:400;
-        color: "orange"
-        name: "robot"
-        m2px: simulator.m2px
-        origin_x: parent.width/2
-        origin_y: parent.height/2
-    }
+    Item {
+        id:agents
 
-    Agent {
-        x: 100; y:100;
-        color: "red"
-        name: "A"
-        m2px: simulator.m2px
-        origin_x: parent.width/2
-        origin_y: parent.height/2
+        Agent {
+            x: 400; y:400;
+            name: "robot"
+            m2px: simulator.m2px
+            origin_x: parent.width/2
+            origin_y: parent.height/2
+        }
+
+
+        Component.onCompleted: {
+            addAgent()
+        }
+
+        property int idx: 0;
+        function addAgent() {
+
+                const agents_list = [{name:"John", color: "orange"},
+                {name:"Emily", color: "blue"},
+                {name:"Will", color: "green"},
+                {name:"Violet", color: "purple"},
+                {name:"Jane", color: "red"},
+                {name:"Bob", color: "orange"},
+                {name:"Mary", color: "blue"},
+                {name:"Matthew", color: "green"},
+                {name:"Edith", color: "purple"},
+                {name:"Thomas", color: "red"},
+            ]
+
+            const component = Qt.createComponent("Agent.qml");
+            console.log(idx);
+            var new_agent = component.createObject(agents, {x: 100 + 100 * Math.floor(idx / 5), y: 100 + 100 * (idx % 5 ), "color": agents_list[idx].color, "name": agents_list[idx].name});
+
+            idx = (idx + 1) % agents_list.length;
+
+            if (new_agent == null) {
+                // Error Handling
+                console.log("Error creating object");
+            }
+        }
+
     }
-    Agent {
-        x: 100; y:200;
-        color: "blue"
-        name: "B"
-        m2px: simulator.m2px
-        origin_x: parent.width/2
-        origin_y: parent.height/2
-    }
-    Agent {
-        x: 100; y:300;
-        color: "green"
-        name: "C"
-        m2px: simulator.m2px
-        origin_x: parent.width/2
-        origin_y: parent.height/2
-    }
-    Agent {
-        x: 100; y:400;
-        color: "purple"
-        name: "D"
-        m2px: simulator.m2px
-        origin_x: parent.width/2
-        origin_y: parent.height/2
-    }
-     WheelHandler {
+    WheelHandler {
         //property: "rotation"
         onWheel: (event)=> {
             m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
-                }
+        }
     }
-}
+    }
