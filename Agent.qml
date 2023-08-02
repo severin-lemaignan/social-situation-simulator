@@ -3,7 +3,7 @@ import QtQuick.Controls 2.12
 
 import io.qt.textproperties 1.0
 
-Rectangle {
+Item {
 
     id: agent
 
@@ -12,23 +12,24 @@ Rectangle {
 
     x: 10; y: 10
     property int position: x+y // property that will change if either X or Y change, so that we can have a onPositionChanged callback
-    color: "red"
+    property string color: "green"
 
     property double m2px: 100
     property int origin_x: 0
     property int origin_y: 0
 
 
-    Rectangle {
+    Image {
         id: body
-        width: 40
+        width: 0.5 * m2px
         height: width * 0.8
-        radius: width/4
+        //radius: width/4
         rotation: parent.gaze_direction + 90
         transformOrigin: Item.Center
         x: - width/2
         y: - height/2
-        color: parent.color
+        property string color: parent.color
+        source: parent.name === "robot" ? "res/robot.svg" : "res/people_" + color + ".svg" 
 
         Drag.active: dragArea.drag.active
         Drag.hotSpot.x: 10
@@ -58,7 +59,7 @@ Rectangle {
 
     Rectangle {
         id: gaze
-        width:20; height:width
+        width:5; height:width
         radius:width/2
 
         color: "black"

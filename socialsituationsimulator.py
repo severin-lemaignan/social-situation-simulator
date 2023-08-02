@@ -24,12 +24,10 @@ class Bridge(QObject):
     @Slot(str, float, float, float)
     def updatePosition(self, name, x, y, theta):
         agents[name] = (x, y, theta)
-        # print(
-        #     "Person <%s> is at %.2f, %.2f (m); orientation: %.1fdeg"
-        #     % (name, x, y, theta)
-        # )
 
-        print(describe(agents))
+        desc = describe(agents)
+        if desc:
+            print(desc)
 
 
 if __name__ == "__main__":

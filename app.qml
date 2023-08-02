@@ -18,7 +18,10 @@ ApplicationWindow {
             x: simulator.width/2 - width/2
             y: simulator.height/2 - height/2
 
-            width: m2px * 2 * (index + 1); height:width; radius:width/2
+            width: m2px * 2 * (index + 1);
+            height:width;
+            radius:width/2
+
             color:"transparent"
             border.width:2
             border.color: "#ddd"

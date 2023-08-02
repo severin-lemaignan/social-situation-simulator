@@ -1,8 +1,8 @@
 import math
 
 SELF = "robot"
-FOV = 120  # field of view, in degrees
-FOA = 60  # field of attention (eg 'looking at smthg'), in degrees
+FOV = 100  # field of view, in degrees
+FOA = 30  # field of attention (eg 'looking at smthg'), in degrees
 
 
 def dist(x1, y1, x2, y2):
