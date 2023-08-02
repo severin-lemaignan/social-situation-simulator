@@ -80,6 +80,14 @@ ApplicationWindow {
             border.color: "#ddd"
         }
     }
+    MouseArea {
+        id: winArea
+        anchors.fill: parent
+        onClicked: {
+            agents.focus=true
+        }
+
+    }
 
 
     Item {
@@ -113,50 +121,44 @@ ApplicationWindow {
             {name:"Matthew", color: "green"},
             {name:"Edith", color: "purple"},
             {name:"Thomas", color: "red"},
-        ]
+            ]
 
-        const component = Qt.createComponent("Agent.qml");
-        var new_agent = component.createObject(agents,
-        {
-            x_m: -2 + 1.0 * Math.floor(idx / 5), 
-            y_m: -2 + 1.0 * (idx % 5 ), 
-            color: agents_list[idx].color, 
-            name: agents_list[idx].name, 
-            m2px:Qt.binding(function() {return m2px}),
-            origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
-            origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
-        });
+            const component = Qt.createComponent("Agent.qml");
+            var new_agent = component.createObject(agents,
+            {
+                x_m: -2 + 1.0 * Math.floor(idx / 5), 
+                y_m: -2 + 1.0 * (idx % 5 ), 
+                color: agents_list[idx].color, 
+                name: agents_list[idx].name, 
+                m2px:Qt.binding(function() {return m2px}),
+                origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
+                origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
+            });
 
-        idx = (idx + 1) % agents_list.length;
+            idx = (idx + 1) % agents_list.length;
 
-        if (new_agent == null) {
-            // Error Handling
-            console.log("Error creating object");
-        }
-    }
-
-    Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Space) {
-
-            bridge.exportScene(agents);
-        }
-    }
-
-}
-
-        MouseArea {
-            id: winArea
-            anchors.fill: parent
-            onClicked: {
-                agents.focus=true
+            if (new_agent == null) {
+                // Error Handling
+                console.log("Error creating object");
             }
-
         }
 
-WheelHandler {
-    //property: "rotation"
-    onWheel: (event)=> {
-        m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
+        Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Space) {
+                timeline.updateKeyframe(agents);
+            }
+            if (event.key === Qt.Key_Delete) {
+                timeline.deleteKeyframe();
+            }
+        }
+
+    }
+
+
+    WheelHandler {
+        //property: "rotation"
+        onWheel: (event)=> {
+            m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
+        }
     }
 }
-    }

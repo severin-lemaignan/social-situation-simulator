@@ -9,8 +9,10 @@ Item {
     property int duration: 10 // sec
 
     property alias implicitWidth: timeline_slider.implicitWidth
+    property alias value: timeline_slider.value
 
-    //property var data
+    property var timeline_data: new Object();
+    property var timeline_data_model: [];
 
     Slider {
         id:timeline_slider
@@ -20,6 +22,9 @@ Item {
         from:0
         to: timeline.duration
         stepSize: 1/timeline.fps
+
+        focusPolicy: Qt.NoFocus
+
         background: Item {
             x: parent.leftPadding + 13
             y: parent.topPadding + parent.availableHeight / 2
@@ -43,6 +48,28 @@ Item {
                     }
                 }
             }
+            Repeater {
+                id: keyframe_handles
+                model: timeline_data_model
+                delegate: Rectangle {
+                        x: modelData.ts * parent.width / timeline.duration - width / 2
+                        y:24
+                        width: 10
+                        height: width
+                        radius: width/2
+                        color: selected ? "orange" : "black"
+
+                        property double ts: modelData.ts
+
+                        property bool selected: false
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {selected=!selected;}
+                        }
+
+                }
+            }
             Rectangle {
                 y: -height / 2
                 width: parent.width
@@ -57,6 +84,36 @@ Item {
                 }
             }
         }
+    }
+
+
+    function updateKeyframe(scene) {
+
+        var frame = {scene:{},ts: value};
+
+        for (var i = 0; i < scene.children.length; i++) {
+            var agent = scene.children[i];
+            frame["scene"][agent.name] = agent.serialize();
+        }
+
+        timeline_data[value.toString()] = frame;
+        timeline_data_model = Object.values(timeline_data);
+
+        console.log(JSON.stringify(timeline_data));
+    }
+
+    function deleteKeyframe() {
+
+        for (var i = 0; i < keyframe_handles.count; i++) {
+            var kf = keyframe_handles.itemAt(i);
+            if (kf.selected) {
+                console.log("Deleting keyframe " + kf.ts);
+                delete timeline_data[kf.ts];
+            }
+        }
+
+        timeline_data_model = Object.values(timeline_data);
+
     }
 
 }

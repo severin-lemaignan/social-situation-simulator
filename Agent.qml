@@ -144,4 +144,14 @@ Item {
         text: "<i>"+name+"</i>"
         color: "#333"
     }
+
+    function serialize() {
+        return {x: x_m, y: y_m, theta: gaze_direction};
+    }
+
+    function deserialize(state) {
+        x_m = state.x;
+        y_m = state.y;
+        gaze_direction = state.theta;
+    }
 }
