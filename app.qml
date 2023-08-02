@@ -3,6 +3,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.15
 
+import io.qt.textproperties 1.0
+
 ApplicationWindow {
     id: simulator
     width: 800
@@ -13,6 +15,9 @@ ApplicationWindow {
 
     property double m2px: 100 // 100px = 1m
 
+    Bridge {
+        id: bridge
+    }
 
     header: ToolBar {
         RowLayout {
@@ -32,9 +37,10 @@ ApplicationWindow {
                 id: btn_add_agent
                 text: "+"
                 highlighted: true
+                focusPolicy: Qt.NoFocus
                 Material.accent: Material.Green
                 onClicked: {
-                    agents.addAgent()
+                    agents.addAgent();
                 }
             }
             ToolButton {
@@ -77,6 +83,7 @@ ApplicationWindow {
 
 
     Item {
+        focus:true
         id:agents
 
         Agent {
@@ -91,6 +98,7 @@ ApplicationWindow {
         Component.onCompleted: {
             addAgent()
         }
+
 
         property int idx: 0;
         function addAgent() {
@@ -127,7 +135,24 @@ ApplicationWindow {
         }
     }
 
+    Keys.onPressed: (event) => {
+        if (event.key === Qt.Key_Space) {
+
+            bridge.exportScene(agents);
+        }
+    }
+
 }
+
+        MouseArea {
+            id: winArea
+            anchors.fill: parent
+            onClicked: {
+                agents.focus=true
+            }
+
+        }
+
 WheelHandler {
     //property: "rotation"
     onWheel: (event)=> {

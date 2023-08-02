@@ -34,7 +34,9 @@ def is_visible(target_x, target_y, base_x, base_y, base_theta, fov=FOV):
         return False
 
 
-def describe(agents):
+def describe(scene):
+
+    agents = scene["agents"]
 
     # only describe if the robot is present in the scene
     if SELF not in agents:

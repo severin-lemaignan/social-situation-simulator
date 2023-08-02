@@ -2,9 +2,11 @@ import sys
 
 from pathlib import Path
 from PySide6.QtQuick import QQuickView
-from PySide6.QtCore import QStringListModel, QUrl, Slot, QObject
+from PySide6.QtCore import QStringListModel, QUrl, Slot, QObject, QRegularExpression
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine, QmlElement
+
+import json
 
 from generate_description import describe
 
@@ -21,17 +23,22 @@ class Bridge(QObject):
     def __init__(self):
         super().__init__()
 
-    @Slot(str, float, float, float)
-    def updatePosition(self, name, x, y, theta):
+    @Slot(QObject)
+    def exportScene(self, scene):
+        agents = scene.findChildren(QObject, QRegularExpression("agent_.*"))
 
-        if not name:
-            return
+        scene = {"agents": {}}
 
-        agents[name] = (x, y, theta)
+        for a in agents:
 
-        desc = describe(agents)
-        if desc:
-            print(desc)
+            scene["agents"][a.property("name")] = (
+                a.property("x_m"),
+                a.property("y_m"),
+                a.property("gaze_direction"),
+            )
+
+        print(describe(scene))
+        print(json.dumps(scene))
 
 
 if __name__ == "__main__":

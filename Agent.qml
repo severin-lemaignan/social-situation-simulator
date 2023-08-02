@@ -1,14 +1,13 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 
-import io.qt.textproperties 1.0
-
 Item {
 
     id: agent
 
     property double gaze_direction: 0.0 // gaze direction, in degrees.
     property string name
+    objectName: "agent_" + name
 
     property double m2px: 100
 
@@ -71,7 +70,6 @@ Item {
             parent.x_m = parent.x/m2px - origin_x;
             parent.y_m = parent.y/m2px - origin_y;
             //console.log(parent.name + " is now at " + parent.x_m + ", " + parent.y_m);
-            bridge.updatePosition(name, x_m, y_m, gaze_direction);
         }
         }
 
@@ -88,20 +86,6 @@ Item {
 
 
     }
-
-    Bridge {
-        id: bridge
-    }
-
-
-    onGaze_directionChanged: {
-        bridge.updatePosition(name, x_m, y_m, gaze_direction);
-    }
-
-    Component.onCompleted: {
-        bridge.updatePosition(name, x_m, y_m, gaze_direction);
-    }
-
 
     Rectangle {
         id: gaze
