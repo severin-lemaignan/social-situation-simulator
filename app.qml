@@ -125,8 +125,8 @@ ApplicationWindow {
             x: 400; y:400;
             name: "robot"
             m2px: simulator.m2px
-            origin_x: (parent.width/2) / m2px
-            origin_y: (parent.height/2) / m2px
+            origin_x: (simulator.width/2) / m2px
+            origin_y: (simulator.height/2) / m2px
         }
 
 
@@ -150,7 +150,6 @@ ApplicationWindow {
             ]
 
             const component = Qt.createComponent("Agent.qml");
-            console.log(idx);
             var new_agent = component.createObject(agents,
             {
                 x_m: -2 + 1.0 * Math.floor(idx / 5), 
@@ -158,8 +157,8 @@ ApplicationWindow {
                 color: agents_list[idx].color, 
                 name: agents_list[idx].name, 
                 m2px:Qt.binding(function() {return m2px}),
-                origin_x: Qt.binding(function(){return (parent.width/2) / m2px}),
-                origin_y: Qt.binding(function(){return (parent.height/2) / m2px}),
+                origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
+                origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
             });
 
             idx = (idx + 1) % agents_list.length;

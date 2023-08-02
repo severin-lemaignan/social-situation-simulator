@@ -23,6 +23,10 @@ class Bridge(QObject):
 
     @Slot(str, float, float, float)
     def updatePosition(self, name, x, y, theta):
+
+        if not name:
+            return
+
         agents[name] = (x, y, theta)
 
         desc = describe(agents)

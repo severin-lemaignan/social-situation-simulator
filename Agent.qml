@@ -19,12 +19,24 @@ Item {
     x: (x_m + origin_x) * m2px; y: (y_m + origin_y) * m2px
 
     property double position: x_m+y_m // property that will change if either X or Y change, so that we can have a onPositionChanged callback
+
     property string color: "green"
 
     property double origin_x: 0
     property double origin_y: 0
 
     property bool selected: false
+
+    FoV {
+        width: 200
+        height: 200
+        rotation: agent.gaze_direction
+        opacity: parent.selected ? 1 : 0.5
+        fov: 100
+        foa: 30
+        x: parent.width/2-width/2
+        y: parent.height/2-height/2
+    }
 
     Image {
         id: selection_shadow
@@ -58,7 +70,8 @@ Item {
             if (!Drag.active) {
             parent.x_m = parent.x/m2px - origin_x;
             parent.y_m = parent.y/m2px - origin_y;
-            console.log(parent.name + " is now at " + parent.x_m + ", " + parent.y_m);
+            //console.log(parent.name + " is now at " + parent.x_m + ", " + parent.y_m);
+            bridge.updatePosition(name, x_m, y_m, gaze_direction);
         }
         }
 
@@ -80,14 +93,14 @@ Item {
         id: bridge
     }
 
-    onPositionChanged: {
-        bridge.updatePosition(name, x_m, y_m, gaze_direction);
-    }
 
     onGaze_directionChanged: {
         bridge.updatePosition(name, x_m, y_m, gaze_direction);
     }
 
+    Component.onCompleted: {
+        bridge.updatePosition(name, x_m, y_m, gaze_direction);
+    }
 
 
     Rectangle {
