@@ -117,22 +117,14 @@ ApplicationWindow {
         focus:true
         id:agents
 
-        Agent {
-            x_m: 0; y_m: 0;
-            name: "robot"
-            m2px: simulator.m2px
-            origin_x: (simulator.width/2) / m2px
-            origin_y: (simulator.height/2) / m2px
-        }
-
-
         Component.onCompleted: {
+            addAgent("robot")
             addAgent()
         }
 
 
         property int idx: 0;
-        function addAgent() {
+        function addAgent(name=undefined) {
 
             const agents_list = [{name:"John", color: "orange"},
                 {name:"Emily", color: "blue"},
@@ -152,10 +144,11 @@ ApplicationWindow {
                 x_m: -2 + 1.0 * Math.floor(idx / 5), 
                 y_m: -2 + 1.0 * (idx % 5 ), 
                 color: agents_list[idx].color, 
-                name: agents_list[idx].name, 
+                name: name ? name : agents_list[idx].name, 
                 m2px:Qt.binding(function() {return m2px}),
                 origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
                 origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
+                timeline: timeline,
             });
 
             idx = (idx + 1) % agents_list.length;
@@ -164,6 +157,42 @@ ApplicationWindow {
                 // Error Handling
                 console.log("Error creating object");
             }
+        }
+
+        function getSelected() {
+
+            var selected = [];
+            for (var idx in children) {
+                var agent = children[idx];
+                if (agent.selected) {
+                    selected.push(agent);
+                }
+            }
+
+            return selected;
+
+        }
+
+        function toggleTalking() {
+            var selected = getSelected();
+            if (selected.length < 1) {
+                print("Need at least 1 selected agent");
+            }
+
+            for (var agent of selected) {
+                agent.talking = !agent.talking;
+            }
+            timeline.updateKeyframe();
+
+        }
+
+        function toggleEngaged() {
+
+            var selected = getSelected();
+            if (selected.length < 2) {
+                print("Need at least 2 selected agents");
+            }
+
         }
 
         Keys.onPressed: (event) => {
@@ -188,7 +217,7 @@ ApplicationWindow {
         focusPolicy: Qt.NoFocus
         Material.accent: Material.Green
         onClicked: {
-            agents.setTalking();
+            agents.toggleTalking();
         }
         anchors.right: parent.right
         anchors.rightMargin: 10
@@ -200,7 +229,7 @@ ApplicationWindow {
         focusPolicy: Qt.NoFocus
         Material.accent: Material.Accent
         onClicked: {
-            agents.setEngaged();
+            agents.toggleEngaged();
         }
         anchors.right: parent.right
         anchors.rightMargin: 10

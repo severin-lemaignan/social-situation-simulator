@@ -175,7 +175,13 @@ Item {
 
         //console.log("at " + t_a + ": " + Object.values(a));
         //console.log("at " + t_b + ": " + Object.values(b));
-        const vals = ab.map(v => v[0] + (v[1]-v[0])/(t_b-t_a)*(t-t_a));
+        const vals = ab.map(v => {
+            if (typeof(v[0]) === "number") {
+                return v[0] + (v[1]-v[0])/(t_b-t_a)*(t-t_a);
+            } else {
+                return v[0];
+            }
+        });
         //console.log("  => at " + t + ": " + vals);
 
         var result = Object.assign({}, a);
@@ -192,7 +198,7 @@ Item {
         return result;
     }
 
-    function updateKeyframe(scene) {
+    function updateKeyframe() {
 
         var frame = {scene:{},ts: value};
 
@@ -328,13 +334,18 @@ Item {
 
             for (var name in scene) {
 
-                var prev_x = prev_scene[name].x;
                 var x = scene[name].x;
-                var prev_y = prev_scene[name].y;
                 var y = scene[name].y;
 
-                prev_scene[name]["vx"] = (x-prev_x)/dt;
-                prev_scene[name]["vy"] = (y-prev_y)/dt;
+                // name might not exist in previous scene if the agent
+                // has just been added
+                if (name in prev_scene) {
+                    var prev_x = prev_scene[name].x;
+                    var prev_y = prev_scene[name].y;
+
+                    prev_scene[name]["vx"] = (x-prev_x)/dt;
+                    prev_scene[name]["vy"] = (y-prev_y)/dt;
+                }
 
                 scene[name]["vx"] = 0;
                 scene[name]["vy"] = 0;

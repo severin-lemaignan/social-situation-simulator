@@ -28,6 +28,12 @@ Item {
 
     property bool selected: false
 
+    property bool talking: true
+    property var engaged_with: []
+
+    // handle to the timeline, used to enable/disable 'talking'
+    property var timeline;
+
     FoV {
         width: 200
         height: 200
@@ -102,6 +108,23 @@ Item {
         opacity: 0.5
     }
 
+    Button {
+        id: speech_bubble
+        icon.name: "user-idle-symbolic"
+        visible: talking
+        x: -10
+        y: -50
+        background:{} 
+        focusPolicy: Qt.NoFocus
+
+        onClicked: {
+            talking=false;
+            timeline.updateKeyframe();
+        }
+
+
+    }
+
     Rectangle {
         id: gaze
         width:5; height:width
@@ -161,7 +184,14 @@ Item {
     }
 
     function serialize() {
-        return {x: x_m, y: y_m, theta: gaze_direction, vx: vx_m, vy: vy_m};
+        return {x: x_m, 
+                y: y_m, 
+                theta: gaze_direction, 
+                vx: vx_m, 
+                vy: vy_m, 
+                talking: talking, 
+                engaged_with: engaged_with
+            };
     }
 
     function deserialize(state) {
@@ -171,5 +201,8 @@ Item {
 
         vx_m = state.vx;
         vy_m = state.vy;
+
+        talking = state.talking;
+        engaged_with = state.engaged_with;
     }
 }
