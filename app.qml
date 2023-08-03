@@ -24,23 +24,6 @@ ApplicationWindow {
     header: ToolBar {
         RowLayout {
             anchors.fill: parent
-            Button {
-                id: btn_add_agent
-                icon.name: "contact-new-symbolic"
-                highlighted: true
-                focusPolicy: Qt.NoFocus
-                Material.accent: Material.Green
-                onClicked: {
-                    agents.addAgent();
-                }
-            }
-            Label {
-                text: "Social Situation Simulator"
-                elide: Label.ElideRight
-                horizontalAlignment: Qt.AlignHCenter
-                verticalAlignment: Qt.AlignVCenter
-                Layout.fillWidth: true
-            }
             ToolButton {
                 icon.name: "document-save-symbolic"
                 focusPolicy: Qt.NoFocus
@@ -50,6 +33,13 @@ ApplicationWindow {
                 icon.name: "document-open-symbolic"
                 focusPolicy: Qt.NoFocus
                 onClicked: loadFileDialog.open()
+            }
+            Label {
+                text: "Social Situation Simulator"
+                elide: Label.ElideRight
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+                Layout.fillWidth: true
             }
             ToolButton {
                 text: qsTr("⋮")
@@ -209,18 +199,32 @@ ApplicationWindow {
         }
 
     }
+    Button {
+        id: add_agent_btn
+        icon.name: "contact-new-symbolic"
+        highlighted: true
+        focusPolicy: Qt.NoFocus
+        Material.accent: Material.Green
+        onClicked: {
+            agents.addAgent();
+        }
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+    }
 
     Button {
         id: talking_btn
         icon.name: "user-idle-symbolic"
         highlighted: true
         focusPolicy: Qt.NoFocus
-        Material.accent: Material.Green
+        Material.accent: Material.primary
         onClicked: {
             agents.toggleTalking();
         }
         anchors.right: parent.right
         anchors.rightMargin: 10
+        anchors.top: add_agent_btn.bottom
+        anchors.topMargin: 5
     }
     Button {
         id: engaged_btn
