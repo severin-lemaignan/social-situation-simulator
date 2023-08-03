@@ -44,6 +44,10 @@ Item {
 
             focusPolicy: Qt.NoFocus
 
+            onMoved: {
+                playing = false;
+            }
+
             background: Item {
                 x: parent.leftPadding + 13
                 y: parent.topPadding + parent.availableHeight / 2

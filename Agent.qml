@@ -14,7 +14,6 @@ Item {
     // coordinates, in meters
     property double x_m: 0
     property double y_m: 0
-
     x: (x_m + origin_x) * m2px; y: (y_m + origin_y) * m2px
 
     property string color: "green"
