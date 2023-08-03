@@ -43,8 +43,41 @@ Item {
         foa: 30
         x: parent.width/2-width/2
         y: parent.height/2-height/2
+
+
+        Image {
+            id: gaze_handle
+            source: "res/rotate.svg"
+
+            width:30
+            height:30
+
+            x: parent.width/2 -width/2 + 0.3 * m2px
+            y: parent.height/2 - height/2
+
+            Drag.active: gazeDragArea.drag.active
+
+
+            MouseArea {
+                id: gazeDragArea
+                anchors.fill: parent
+
+                drag.target: rotation_target
+            }
+        }
+
+
     }
 
+    Item {
+        id: rotation_target
+
+        property int position: x+y
+        onPositionChanged: {
+
+            agent.gaze_direction = Math.atan2(y+agent.height/2,x+agent.width/2) * 180/Math.PI;
+        }
+    }
 
     Image {
         id: selection_shadow
@@ -76,10 +109,10 @@ Item {
         Drag.hotSpot.y: 10
         Drag.onActiveChanged: {
             if (!Drag.active) {
-            parent.x_m = parent.x/m2px - origin_x;
-            parent.y_m = parent.y/m2px - origin_y;
-            //console.log(parent.name + " is now at " + parent.x_m + ", " + parent.y_m);
-        }
+                parent.x_m = parent.x/m2px - origin_x;
+                parent.y_m = parent.y/m2px - origin_y;
+                //console.log(parent.name + " is now at " + parent.x_m + ", " + parent.y_m);
+            }
         }
 
         MouseArea {
@@ -114,7 +147,7 @@ Item {
         visible: talking
         x: -20
         y: -50
-        background:{} 
+        background:Item{} 
         focusPolicy: Qt.NoFocus
 
         onClicked: {
@@ -127,7 +160,7 @@ Item {
         id: engaged
         icon.name: "send-to-symbolic"
         visible: engaged_with.length !== 0
-        background:{} 
+        background: Item{} 
         focusPolicy: Qt.NoFocus
         anchors.left: speech_bubble.right
         anchors.leftMargin: 4
@@ -142,56 +175,6 @@ Item {
 
     }
 
-    Rectangle {
-        id: gaze
-        width:5; height:width
-        radius:width/2
-
-        color: "black"
-
-        x: parent.width/2-width/2 + 30 * Math.cos(parent.gaze_direction * Math.PI/180)
-        y: parent.height/2-height/2 + 30 * Math.sin(parent.gaze_direction * Math.PI/180)
-    }
-
-    Rectangle {
-        id: gaze_handle
-        //anchors.fill: gaze
-        color: "transparent"
-
-        width:20
-        height:20
-
-        x:0
-        y:0
-
-        Binding on x {
-            when: !gazeDragArea.drag.active
-            value: gaze.x
-        }
-
-        Binding on y {
-            when: !gazeDragArea.drag.active
-            value: gaze.y
-        }
-
-        property int position: x+y
-
-        Drag.active: gazeDragArea.drag.active
-
-        MouseArea {
-            id: gazeDragArea
-            anchors.fill: parent
-
-            drag.target: parent
-        }
-
-        onPositionChanged: {
-
-            if (gazeDragArea.drag.active) {
-                parent.gaze_direction = Math.atan2(y-height/2+parent.height/2,x-width/2+parent.width/2) * 180/Math.PI;
-            }
-        }
-    }
 
     Text {
         y: body.height/2 + 5
@@ -202,13 +185,13 @@ Item {
 
     function serialize() {
         return {x: x_m, 
-                y: y_m, 
-                theta: gaze_direction, 
-                vx: vx_m, 
-                vy: vy_m, 
-                talking: talking, 
-                engaged_with: engaged_with
-            };
+            y: y_m, 
+            theta: gaze_direction, 
+            vx: vx_m, 
+            vy: vy_m, 
+            talking: talking, 
+            engaged_with: engaged_with
+        };
     }
 
     function deserialize(state) {
