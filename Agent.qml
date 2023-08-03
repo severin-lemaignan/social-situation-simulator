@@ -14,6 +14,11 @@ Item {
     // coordinates, in meters
     property double x_m: 0
     property double y_m: 0
+
+    // velocity -- computed and set by the timeline
+    property double vx_m: 0
+    property double vy_m: 0
+
     x: (x_m + origin_x) * m2px; y: (y_m + origin_y) * m2px
 
     property string color: "green"
@@ -33,6 +38,7 @@ Item {
         x: parent.width/2-width/2
         y: parent.height/2-height/2
     }
+
 
     Image {
         id: selection_shadow
@@ -82,6 +88,18 @@ Item {
 
 
 
+    }
+
+    Arrow {
+        id: velocity
+        width: 400
+        height: 400
+        dx: vx_m
+        dy: vy_m
+        m2px: agent.m2px
+        x: parent.width/2-width/2
+        y: parent.height/2-height/2
+        opacity: 0.5
     }
 
     Rectangle {
@@ -143,12 +161,15 @@ Item {
     }
 
     function serialize() {
-        return {x: x_m, y: y_m, theta: gaze_direction};
+        return {x: x_m, y: y_m, theta: gaze_direction, vx: vx_m, vy: vy_m};
     }
 
     function deserialize(state) {
         x_m = state.x;
         y_m = state.y;
         gaze_direction = state.theta;
+
+        vx_m = state.vx;
+        vy_m = state.vy;
     }
 }

@@ -184,6 +184,11 @@ Item {
             result[k] = vals[idx];
             idx++
         }
+
+        // fixes for 'special' values:
+        result.vx = a.vx;
+        result.vy = a.vy;
+
         return result;
     }
 
@@ -197,9 +202,12 @@ Item {
         }
 
         timeline_data[value.toString()] = frame;
+
+        recomputeVelocities();
+
         timeline_data_model = Object.values(timeline_data);
 
-        //console.log(JSON.stringify(timeline_data));
+        console.log(JSON.stringify(timeline_data));
     }
 
 
@@ -244,6 +252,7 @@ Item {
             } else if(xhr.readyState === XMLHttpRequest.DONE) {
                 //print('DONE')
                 timeline_data = JSON.parse(xhr.responseText.toString());
+                recomputeVelocities();
                 timeline_data_model = Object.values(timeline_data);
             }
         }
@@ -281,4 +290,58 @@ Item {
         if (!playing) {return;}
         playing = false;
     }
+
+    /** at each keyframe, compute the velocity of each the agent that
+     * would take it to the next keyframe, and store it in the 
+     * timeline_data structure.
+     *
+     * At the last keyframe, the velocity is set to 0.
+     */
+    function recomputeVelocities() {
+
+        var timestamps = Object.keys(timeline_data).sort().map(x => parseFloat(x));
+        if (timestamps.length == 0) {
+            return;
+        }
+        if (timestamps.length == 1) {
+            var scene = timeline_data[timestamps[0].toString()].scene;
+
+            for (var name in scene) {
+                scene[name]["vx"] = 0;
+                scene[name]["vy"] = 0;
+            }
+        }
+
+
+        var prev_ts = timestamps[0];
+
+        for (var ts of timestamps.slice(1)) {
+
+            var dt = ts - prev_ts;
+
+            var scene = timeline_data[ts.toString()].scene;
+            var prev_scene = timeline_data[prev_ts.toString()].scene;
+
+            for (var name in scene) {
+
+                var prev_x = prev_scene[name].x;
+                var x = scene[name].x;
+                var prev_y = prev_scene[name].y;
+                var y = scene[name].y;
+
+                prev_scene[name]["vx"] = (x-prev_x)/dt;
+                prev_scene[name]["vy"] = (y-prev_y)/dt;
+
+                scene[name]["vx"] = 0;
+                scene[name]["vy"] = 0;
+            }
+
+            prev_ts = ts;
+
+        }
+    }
+
+
+
+
 }
