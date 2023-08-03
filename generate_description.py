@@ -5,9 +5,12 @@ FOV = 100  # field of view, in degrees
 FOA = 30  # field of attention (eg 'looking at smthg'), in degrees
 
 
-def dist(x1, y1, x2, y2):
+def dist(ag1, ag2):
 
-    d = math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+    d = math.sqrt(
+        (ag2["x"] - ag1["x"]) * (ag2["x"] - ag1["x"])
+        + (ag2["y"] - ag1["y"]) * (ag2["y"] - ag1["y"])
+    )
     # print(f"distance: {d}")
 
     if d < 1:
@@ -19,10 +22,11 @@ def dist(x1, y1, x2, y2):
     return ""
 
 
-def is_visible(target_x, target_y, base_x, base_y, base_theta, fov=FOV):
+def is_visible(target, base, fov=FOV):
 
     angle = (
-        math.atan2(target_y - base_y, target_x - base_x) * 180 / math.pi - base_theta
+        math.atan2(target["y"] - base["y"], target["x"] - base["x"]) * 180 / math.pi
+        - base["theta"]
     )
 
     # print(
@@ -34,45 +38,46 @@ def is_visible(target_x, target_y, base_x, base_y, base_theta, fov=FOV):
         return False
 
 
-def describe(scene):
+def describe(scene, seen_by=SELF):
 
-    agents = scene["agents"]
+    agents = scene["scene"]
 
-    # only describe if the robot is present in the scene
-    if SELF not in agents:
+    # # only describe if the robot is present in the scene
+    if seen_by not in agents:
+        print("%s not in the scene. Can not generate description" % seen_by)
         return ""
 
-    rx, ry, rtheta = agents[SELF]
+    ref = agents[seen_by]
 
     desc = ""
 
-    for name, (x, y, theta) in agents.items():
+    for name, ag in agents.items():
 
-        if name == SELF:
+        if name == seen_by:
             continue
 
-        if not is_visible(x, y, rx, ry, rtheta):
+        if not is_visible(ag, ref):
             # print(f"{name} not visible")
             continue
         # print(f"{name} visible")
 
-        desc += f"I see {name}; "
+        desc += f"{seen_by} sees {name}; "
 
-        distance = dist(x, y, rx, ry)
+        distance = dist(ag, ref)
         if distance:
-            desc += f"{name} is {distance} me; "
+            desc += f"{name} is {distance} {seen_by}; "
 
-        for target_name, (target_x, target_y, target_theta) in agents.items():
+        for target_name, tg in agents.items():
 
             if target_name == name:
                 continue
 
-            distance = dist(target_x, target_y, x, y)
+            distance = dist(tg, ag)
             # add 'looking at' only if A is not far from B
             if "far" not in distance:
 
-                AseesB = is_visible(target_x, target_y, x, y, theta, fov=FOA)
-                BseesA = is_visible(x, y, target_x, target_y, target_theta, fov=FOA)
+                AseesB = is_visible(tg, ag, fov=FOA)
+                BseesA = is_visible(ag, tg, fov=FOA)
 
                 if AseesB and BseesA:
                     desc += f"{name} and {target_name} are looking at each other; "

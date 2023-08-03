@@ -18,6 +18,7 @@ ApplicationWindow {
 
     Bridge {
         id: bridge
+
     }
 
     header: ToolBar {
@@ -176,6 +177,9 @@ ApplicationWindow {
         }
         if (event.key === Qt.Key_Delete) {
             timeline.deleteKeyframe();
+        }
+        if (event.key === Qt.Key_Return) {
+            bridge.describe(timeline.toJson());
         }
     }
 

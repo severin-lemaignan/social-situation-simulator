@@ -216,17 +216,19 @@ Item {
 
     }
 
+    function toJson() {
+        return JSON.stringify(timeline_data);
+    }
+
     function save(fileUrl) {
-        var json = JSON.stringify(timeline_data);
-        console.log("Saving to " + fileUrl);
+        var json = toJson();
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
-                print('HEADERS_RECEIVED')
+                //print('HEADERS_RECEIVED')
             } else if(xhr.readyState === XMLHttpRequest.DONE) {
-                print('DONE')
-                //timeline_data = JSON.parse(xhr.responseText.toString());
-                //timeline_data_model = Object.values(timeline_data);
+                console.log("Saved to " + fileUrl);
+                //print('DONE')
             }
         }
         xhr.open("PUT", fileUrl);

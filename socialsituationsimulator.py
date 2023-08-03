@@ -32,25 +32,46 @@ agents = {}
 
 @QmlElement
 class Bridge(QObject):
+
+    _scene_changed = Signal()
+
     def __init__(self):
         super().__init__()
 
-    @Slot(QObject)
-    def exportScene(self, scene):
-        agents = scene.findChildren(QObject, QRegularExpression("agent_.*"))
+    #        self._scene = {}
+    #
+    #    @Slot(QObject)
+    #    def exportScene(self, scene):
+    #        agents = scene.findChildren(QObject, QRegularExpression("agent_.*"))
+    #
+    #        scene = {"agents": {}}
+    #
+    #        for a in agents:
+    #
+    #            scene["agents"][a.property("name")] = (
+    #                a.property("x_m"),
+    #                a.property("y_m"),
+    #                a.property("gaze_direction"),
+    #            )
+    #
+    #        print(describe(scene))
+    #        self._scene = json.dumps(scene)
+    #        self._scene_changed.emit()
+    #        print(self._scene)
+    #
 
-        scene = {"agents": {}}
+    @Slot(str)
+    def describe(self, json_situation):
+        situation = {float(k): v for k, v in json.loads(json_situation).items()}
 
-        for a in agents:
+        timestamps = sorted(situation.keys())
 
-            scene["agents"][a.property("name")] = (
-                a.property("x_m"),
-                a.property("y_m"),
-                a.property("gaze_direction"),
-            )
-
-        print(describe(scene))
-        print(json.dumps(scene))
+        print(timestamps)
+        print(situation)
+        for ts in timestamps:
+            print("At %ss:" % ts)
+            desc = describe(situation[ts])
+            print(desc)
 
 
 if __name__ == "__main__":
