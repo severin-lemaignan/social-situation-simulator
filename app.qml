@@ -168,12 +168,13 @@ ApplicationWindow {
 
         Keys.onPressed: (event) => {
             if (event.key === Qt.Key_Space) {
-                timeline.updateKeyframe(agents);
+                timeline.togglePlay();
             }
             if (event.key === Qt.Key_Delete) {
                 timeline.deleteKeyframe();
             }
             if (event.key === Qt.Key_Return) {
+                timeline.updateKeyframe();
                 bridge.describe(timeline.toJson());
             }
         }

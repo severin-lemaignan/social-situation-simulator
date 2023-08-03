@@ -291,6 +291,10 @@ Item {
         playing = false;
     }
 
+    function togglePlay() {
+        playing ? stop() : play()
+    }
+
     /** at each keyframe, compute the velocity of each the agent that
      * would take it to the next keyframe, and store it in the 
      * timeline_data structure.
