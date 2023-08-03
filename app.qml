@@ -183,6 +183,15 @@ ApplicationWindow {
                 print("Need at least 2 selected agents");
             }
 
+            for (var agent of selected) {
+                for (var agent2 of selected) {
+                    if (agent2.name != agent.name && !agent.engaged_with.includes(agent2.name)) {
+                        agent.engaged_with.push(agent2.name);
+                    }
+                }
+            }
+            timeline.updateKeyframe();
+
         }
 
         Keys.onPressed: (event) => {

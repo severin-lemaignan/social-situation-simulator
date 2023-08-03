@@ -28,7 +28,7 @@ Item {
 
     property bool selected: false
 
-    property bool talking: true
+    property bool talking: false
     property var engaged_with: []
 
     // handle to the timeline, used to enable/disable 'talking'
@@ -112,7 +112,7 @@ Item {
         id: speech_bubble
         icon.name: "user-idle-symbolic"
         visible: talking
-        x: -10
+        x: -20
         y: -50
         background:{} 
         focusPolicy: Qt.NoFocus
@@ -121,6 +121,23 @@ Item {
             talking=false;
             timeline.updateKeyframe();
         }
+    }
+
+    Button {
+        id: engaged
+        icon.name: "send-to-symbolic"
+        visible: engaged_with.length !== 0
+        background:{} 
+        focusPolicy: Qt.NoFocus
+        anchors.left: speech_bubble.right
+        anchors.leftMargin: 4
+        y: -50
+
+        onClicked: {
+            engaged_with=[];
+            timeline.updateKeyframe();
+        }
+
 
 
     }
@@ -202,7 +219,12 @@ Item {
         vx_m = state.vx;
         vy_m = state.vy;
 
-        talking = state.talking;
-        engaged_with = state.engaged_with;
+        if ("talking" in state) {
+            talking = state.talking;
+        }
+
+        if ("engaged_with" in state) {
+            engaged_with = state.engaged_with;
+        }
     }
 }
