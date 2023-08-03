@@ -24,10 +24,15 @@ ApplicationWindow {
     header: ToolBar {
         RowLayout {
             anchors.fill: parent
-            ToolButton {
-                text: qsTr("‹")
+            Button {
+                id: btn_add_agent
+                icon.name: "contact-new-symbolic"
+                highlighted: true
                 focusPolicy: Qt.NoFocus
-                onClicked: stack.pop()
+                Material.accent: Material.Green
+                onClicked: {
+                    agents.addAgent();
+                }
             }
             Label {
                 text: "Social Situation Simulator"
@@ -36,23 +41,13 @@ ApplicationWindow {
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
-            Button {
-                id: btn_add_agent
-                text: "+"
-                highlighted: true
-                focusPolicy: Qt.NoFocus
-                Material.accent: Material.Green
-                onClicked: {
-                    agents.addAgent();
-                }
-            }
             ToolButton {
-                text: qsTr("Save")
+                icon.name: "document-save-symbolic"
                 focusPolicy: Qt.NoFocus
                 onClicked: saveFileDialog.open()
             }
             ToolButton {
-                text: qsTr("Load")
+                icon.name: "document-open-symbolic"
                 focusPolicy: Qt.NoFocus
                 onClicked: loadFileDialog.open()
             }
@@ -140,56 +135,84 @@ ApplicationWindow {
         function addAgent() {
 
             const agents_list = [{name:"John", color: "orange"},
-            {name:"Emily", color: "blue"},
-            {name:"Will", color: "green"},
-            {name:"Violet", color: "purple"},
-            {name:"Jane", color: "red"},
-            {name:"Bob", color: "orange"},
-            {name:"Mary", color: "blue"},
-            {name:"Matthew", color: "green"},
-            {name:"Edith", color: "purple"},
-            {name:"Thomas", color: "red"},
-        ]
+                {name:"Emily", color: "blue"},
+                {name:"Will", color: "green"},
+                {name:"Violet", color: "purple"},
+                {name:"Jane", color: "red"},
+                {name:"Bob", color: "orange"},
+                {name:"Mary", color: "blue"},
+                {name:"Matthew", color: "green"},
+                {name:"Edith", color: "purple"},
+                {name:"Thomas", color: "red"},
+            ]
 
-        const component = Qt.createComponent("Agent.qml");
-        var new_agent = component.createObject(agents,
-        {
-            x_m: -2 + 1.0 * Math.floor(idx / 5), 
-            y_m: -2 + 1.0 * (idx % 5 ), 
-            color: agents_list[idx].color, 
-            name: agents_list[idx].name, 
-            m2px:Qt.binding(function() {return m2px}),
-            origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
-            origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
-        });
+            const component = Qt.createComponent("Agent.qml");
+            var new_agent = component.createObject(agents,
+            {
+                x_m: -2 + 1.0 * Math.floor(idx / 5), 
+                y_m: -2 + 1.0 * (idx % 5 ), 
+                color: agents_list[idx].color, 
+                name: agents_list[idx].name, 
+                m2px:Qt.binding(function() {return m2px}),
+                origin_x: Qt.binding(function(){return (simulator.width/2) / m2px}),
+                origin_y: Qt.binding(function(){return (simulator.height/2) / m2px}),
+            });
 
-        idx = (idx + 1) % agents_list.length;
+            idx = (idx + 1) % agents_list.length;
 
-        if (new_agent == null) {
-            // Error Handling
-            console.log("Error creating object");
+            if (new_agent == null) {
+                // Error Handling
+                console.log("Error creating object");
+            }
         }
+
+        Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Space) {
+                timeline.updateKeyframe(agents);
+            }
+            if (event.key === Qt.Key_Delete) {
+                timeline.deleteKeyframe();
+            }
+            if (event.key === Qt.Key_Return) {
+                bridge.describe(timeline.toJson());
+            }
+        }
+
     }
 
-    Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Space) {
-            timeline.updateKeyframe(agents);
+    Button {
+        id: talking_btn
+        icon.name: "user-idle-symbolic"
+        highlighted: true
+        focusPolicy: Qt.NoFocus
+        Material.accent: Material.Green
+        onClicked: {
+            agents.setTalking();
         }
-        if (event.key === Qt.Key_Delete) {
-            timeline.deleteKeyframe();
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+    }
+    Button {
+        id: engaged_btn
+        icon.name: "system-users-symbolic"
+        highlighted: true
+        focusPolicy: Qt.NoFocus
+        Material.accent: Material.Accent
+        onClicked: {
+            agents.setEngaged();
         }
-        if (event.key === Qt.Key_Return) {
-            bridge.describe(timeline.toJson());
-        }
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.top: talking_btn.bottom
+        anchors.topMargin: 5
     }
 
-}
 
 
-WheelHandler {
-    //property: "rotation"
-    onWheel: (event)=> {
-        m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
+    WheelHandler {
+        //property: "rotation"
+        onWheel: (event)=> {
+            m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
+        }
     }
-}
 }

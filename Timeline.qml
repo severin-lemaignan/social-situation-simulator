@@ -23,7 +23,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         ToolButton {
-            text: playing ? "||" : ">"
+            icon.name: playing ? "media-playback-pause" : "media-playback-start"
             focusPolicy: Qt.NoFocus
             onClicked: {
                 if (playing) {
