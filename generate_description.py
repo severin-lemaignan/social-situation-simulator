@@ -61,11 +61,14 @@ def describe(scene, seen_by=SELF):
             continue
         # print(f"{name} visible")
 
-        desc += f"{seen_by} sees {name}; "
+        # desc += f"{seen_by} sees {name}; "
 
         distance = dist(ag, ref)
         if distance:
             desc += f"{name} is {distance} {seen_by}; "
+
+        if ag["talking"]:
+            desc += f"{name} is talking; "
 
         for target_name, tg in agents.items():
 
