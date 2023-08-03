@@ -97,7 +97,8 @@ ApplicationWindow {
         id: winArea
         anchors.fill: parent
         onClicked: {
-            agents.focus=true
+            agents.focus=true;
+            agents.unselectAll();
         }
 
     }
@@ -161,6 +162,13 @@ ApplicationWindow {
 
             return selected;
 
+        }
+
+        function unselectAll() {
+            for (var idx in children) {
+                var agent = children[idx];
+                agent.selected = false;
+            }
         }
 
         function toggleTalking() {
