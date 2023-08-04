@@ -2,7 +2,7 @@
 
 import numpy as np
 import json
-import sys
+import csv
 import argparse
 
 from generate_description import describe
@@ -118,6 +118,40 @@ def to_json(situation):
     return json.dumps({to_str(k): v for k, v in situation.items()})
 
 
+def to_csv(csv_file, situation, window_length, sampling_rate):
+
+    rows = []
+
+    for ts, v in situation.items():
+
+        if ts < window_length:
+            continue
+
+        scene = v["scene"]
+
+        for name, state in scene.items():
+            engaged = 0
+            if len(state["engaged_with"]) > 0:
+                engaged = 1
+
+            frames = get_frames(
+                situation,
+                np.arange(ts - window_length, ts + 0.0001, 1 / sampling_rate),
+            )
+
+            descriptions = [describe(f, seen_by=name) for f in reversed(frames)]
+            rows.append([engaged, name] + descriptions)
+
+    header = ["engaged", "viewed_by"] + [
+        "t-%s" % ts
+        for ts in list(np.arange(0, window_length + 0.001, 1 / sampling_rate))
+    ]
+    csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONNUMERIC)
+    csv_writer.writerow(header)
+    for row in rows:
+        csv_writer.writerow(row)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -177,10 +211,13 @@ if __name__ == "__main__":
     # print(to_json(resampled))
 
     if args.csv:
-        to_csv(args.csv)
+        with open(args.csv, "w") as f:
+            to_csv(f, resampled, args.window_length, args.sampling_rate)
+
     elif args.json:
         with open(args.json, "w") as f:
             f.write(to_json(resampled))
+
     else:
 
         for ts, name in get_frames_with_engagement(resampled):
