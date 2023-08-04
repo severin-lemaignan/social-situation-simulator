@@ -1,20 +1,23 @@
 Social Situation Simulator
 ==========================
 
-<figure class="video_container">
-  <video controls="true" allowfullscreen="true">
-    <source src="doc/social-interactions-simulator.mp4" type="video/mp4">
-  </video>
-</figure>
+A tool to create, visualize, annotate and analyse social situations.
+
+![screenshot](doc/screenshot.png)
+
 
 Usage
 -----
 
 - Ensure PySide6 is installed (`pip3 install pyside6`)
-- `python3 socialsituationsimulator.py`
+- `socialsituationsimulator.py`
 
-The black dot represent the gaze direction, drag it to change the orientation of
-the little characters.
+Analysis
+--------
 
+If you export a social situation to a JSON file, you can then post-process it
+and analyse it with `analyse.py`.
+
+Check `./analyse.py -h` for the main options.
 
 
