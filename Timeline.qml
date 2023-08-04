@@ -109,61 +109,64 @@ Item {
             }
 
 
-            onValueChanged: {
+            onValueChanged: refreshScene()
 
-                var new_scene = {}
-
-                var timestamps = Object.keys(timeline_data).sort().map(x => parseFloat(x));
-
-                //console.log("Current time: " + value);
-                //console.log("Timestamps: " + timestamps);
-
-                // outside of the timestamp range? return
-                if (value < Math.min(...timestamps) || value > Math.max(...timestamps)) {
-                    return
-                }
-
-                if (value.toString() in timeline_data) {
-                    new_scene = timeline_data[value.toString()].scene;
-                }
-                else {
-                    // find prev and next timestamps
-                    var prev_t = timestamps[0];
-                    var next_t = 0;
-
-                    for (var i = 1; i < timestamps.length; i++) {
-                        if (value < timestamps[i]) {
-                            next_t = timestamps[i];
-                            break;
-                        }
-                        else {
-                            prev_t = timestamps[i];
-                        }
-                    }
-
-                    // interpolate
-                    for (const name in timeline_data[prev_t.toString()].scene) {
-                        new_scene[name] = interpolate(
-                            timeline_data[prev_t.toString()].scene[name],
-                            prev_t,
-                            timeline_data[next_t.toString()].scene[name],
-                            next_t,
-                            value);
-                        }
-                    }
-
-                    for (var i = 0; i < scene.children.length; i++) {
-                        var agent = scene.children[i];
-
-                        if (agent.name in new_scene) {
-                            agent.deserialize(new_scene[agent.name]);
-                        }
-                    }
-            }
 
         }
     }
 
+
+    function refreshScene() {
+
+        var new_scene = {}
+
+        var timestamps = Object.keys(timeline_data).map(x => parseFloat(x)).sort(function(a,b) { return a - b;});
+
+        //console.log("Current time: " + value);
+        //console.log("Timestamps: " + timestamps);
+
+        // outside of the timestamp range? return
+        if (value < Math.min(...timestamps) || value > Math.max(...timestamps)) {
+            return
+        }
+
+        if (value.toString() in timeline_data) {
+            new_scene = timeline_data[value.toString()].scene;
+        }
+        else {
+            // find prev and next timestamps
+            var prev_t = timestamps[0];
+            var next_t = 0;
+
+            for (var i = 1; i < timestamps.length; i++) {
+                if (value < timestamps[i]) {
+                    next_t = timestamps[i];
+                    break;
+                }
+                else {
+                    prev_t = timestamps[i];
+                }
+            }
+
+            // interpolate
+            for (const name in timeline_data[prev_t.toString()].scene) {
+                new_scene[name] = interpolate(
+                    timeline_data[prev_t.toString()].scene[name],
+                    prev_t,
+                    timeline_data[next_t.toString()].scene[name],
+                    next_t,
+                    value);
+             }
+        }
+
+        for (var i = 0; i < scene.children.length; i++) {
+            var agent = scene.children[i];
+
+            if (agent.name in new_scene) {
+                agent.deserialize(new_scene[agent.name]);
+            }
+        }
+    }
 
 
 
@@ -250,7 +253,7 @@ Item {
 
     }
 
-    function load(fileUrl) {
+    function load(fileUrl, agents) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
@@ -258,8 +261,23 @@ Item {
             } else if(xhr.readyState === XMLHttpRequest.DONE) {
                 //print('DONE')
                 timeline_data = JSON.parse(xhr.responseText.toString());
+
+                // wtf javascript??? by default sort() converts everything to strings first...!
+                var timestamps = Object.keys(timeline_data).map(x => parseFloat(x)).sort(function(a,b) { return a - b;});
+
+                duration = timestamps[timestamps.length-1] - timestamps[0]
+
+
                 recomputeVelocities();
                 timeline_data_model = Object.values(timeline_data);
+
+                agents.deleteAll();
+                for (var name in timeline_data[timeline_data_model[0].ts].scene) {
+                    agents.addAgent(name);
+                }
+
+                value = timestamps[0];
+                refreshScene();
             }
         }
         xhr.open("GET", fileUrl);
@@ -302,14 +320,15 @@ Item {
     }
 
     /** at each keyframe, compute the velocity of each the agent that
-     * would take it to the next keyframe, and store it in the 
-     * timeline_data structure.
-     *
-     * At the last keyframe, the velocity is set to 0.
-     */
+        * would take it to the next keyframe, and store it in the 
+        * timeline_data structure.
+        *
+        * At the last keyframe, the velocity is set to 0.
+        */
     function recomputeVelocities() {
 
-        var timestamps = Object.keys(timeline_data).sort().map(x => parseFloat(x));
+        var timestamps = Object.keys(timeline_data).map(x => parseFloat(x)).sort(function(a,b) { return a - b;});
+
         if (timestamps.length == 0) {
             return;
         }
@@ -355,8 +374,5 @@ Item {
 
         }
     }
-
-
-
 
 }

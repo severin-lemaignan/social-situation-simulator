@@ -60,7 +60,7 @@ ApplicationWindow {
         id: loadFileDialog
         fileMode: FileDialog.OpenFile
         nameFilters: ["JSON files (*.json)", "All files (*)"]
-        onAccepted: timeline.load(loadFileDialog.selectedFile)
+        onAccepted: timeline.load(loadFileDialog.selectedFile, agents)
     }
 
     footer: ToolBar{
@@ -168,6 +168,13 @@ ApplicationWindow {
             for (var idx in children) {
                 var agent = children[idx];
                 agent.selected = false;
+            }
+        }
+
+        function deleteAll() {
+            for (var idx in children) {
+                var agent = children[idx];
+                agent.destroy();
             }
         }
 
