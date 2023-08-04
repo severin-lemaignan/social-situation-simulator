@@ -275,7 +275,8 @@ ApplicationWindow {
     WheelHandler {
         //property: "rotation"
         onWheel: (event)=> {
-            m2px = Math.max(50, Math.min(400, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
+
+            m2px = Math.max(50, Math.min(200, m2px + 15 * event.angleDelta.y/Math.abs(event.angleDelta.y)));
         }
     }
 }
