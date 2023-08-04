@@ -119,9 +119,7 @@ def to_json(situation):
     return json.dumps({to_str(k): v for k, v in situation.items()})
 
 
-def to_csv(csv_file, situation, window_length, sampling_rate):
-
-    generate_description.TRANSFORM_NAMES = False
+def to_csv(csv_file, situation, window_length, sampling_rate, random_name=False):
 
     rows = []
 
@@ -142,10 +140,13 @@ def to_csv(csv_file, situation, window_length, sampling_rate):
                 np.arange(ts - window_length, ts + 0.0001, 1 / sampling_rate),
             )
 
-            descriptions = [describe(f, seen_by=name) for f in reversed(frames)]
-            rows.append([engaged, generate_description.r(name)] + descriptions)
+            descriptions = [
+                describe(f, seen_by=name, random_names=random_name)
+                for f in reversed(frames)
+            ]
+            rows.append([engaged, generate_description.r(name), ts] + descriptions)
 
-    header = ["engaged", "viewed_by"] + [
+    header = ["engaged", "viewed_by", "actual_ts"] + [
         "t-%s" % ts
         for ts in list(np.arange(0, window_length + 0.001, 1 / sampling_rate))
     ]

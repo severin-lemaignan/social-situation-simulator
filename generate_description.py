@@ -118,6 +118,8 @@ NAMES_MAP = {}
 
 def r(name):
     if not TRANSFORM_NAMES:
+        if name == "robot":
+            return "Joe"
         return name
 
     if name not in NAMES_MAP:
@@ -163,24 +165,36 @@ def dist(ag1, ag2):
         (ag2["x"] - ag1["x"]) * (ag2["x"] - ag1["x"])
         + (ag2["y"] - ag1["y"]) * (ag2["y"] - ag1["y"])
     )
-    # print(f"distance: {d}")
 
     if d < CLOSE:
         return CLOSE, "{ag} is close to {ref}"
 
     if d > FAR:
-        # return "{r(ag)} is far from {r(ref)}"
         return FAR, ""
 
-    return MEDIUM, "{ag} is not far from {ref}"
+    if is_facing(ag1, ag2):
+        return MEDIUM, "{ag} is not far from {ref}"
+
+    # if the two agents are not really close, or a bit farther away, but facing each other, consider them 'far' from each other
+    return FAR, ""
+
+
+def is_facing(ag1, ag2):
+    return is_visible(ag1, ag2) and is_visible(ag2, ag1)
 
 
 def is_visible(target, base, fov=FOV):
+
+    if target == base:
+        return True
 
     angle = (
         math.atan2(target["y"] - base["y"], target["x"] - base["x"]) * 180 / math.pi
         - base["theta"]
     )
+
+    # wrap angle in -180, 180
+    angle = math.remainder(angle * math.pi / 180, 2 * math.pi) * 180 / math.pi
 
     # print(
     #    f"I'm at {base_x},{base_y},{base_theta}; target at {target_x}, {target_y} -> {angle}"
@@ -191,8 +205,12 @@ def is_visible(target, base, fov=FOV):
         return False
 
 
-def describe(scene, seen_by=SELF):
+def describe(scene, seen_by=SELF, random_names=True):
 
+    global TRANSFORM_NAMES
+    TRANSFORM_NAMES = random_names
+
+    print(f"At {scene['ts']}s:")
     agents = scene["scene"]
 
     # # only describe if the robot is present in the scene
@@ -215,7 +233,9 @@ def describe(scene, seen_by=SELF):
         # print(f"{name} visible")
 
         # desc += f"{seen_by} sees {name}; "
+
         motion = relative_motion(ag, ref)
+
         if motion:
             desc.add(motion.format(ag=r(name), ref=r(seen_by)))
 
@@ -229,6 +249,10 @@ def describe(scene, seen_by=SELF):
         for target_name, tg in agents.items():
 
             if target_name == name:
+                continue
+
+            if not is_visible(tg, ref, fov=FOV):
+                print(f"{seen_by} can not see {target_name}")
                 continue
 
             if not is_visible(tg, ag, fov=FOV):
@@ -249,6 +273,7 @@ def describe(scene, seen_by=SELF):
                     else:
                         desc.add(f"{r(name)} is looking at {r(target_name)}")
                 else:
-                    desc.add(f"{r(name)} is not looking at {r(target_name)}")
+                    pass
+                    # desc.add(f"{r(name)} is not looking at {r(target_name)}")
 
     return "; ".join(x for x in desc)
