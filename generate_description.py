@@ -1,4 +1,108 @@
+import random
 import math
+
+NAMES = [
+    "Oliver",
+    "George",
+    "William",
+    "Jack",
+    "James",
+    "Thomas",
+    "Charlie",
+    "Harry",
+    "Henry",
+    "Alexander",
+    "Benjamin",
+    "Daniel",
+    "Michael",
+    "David",
+    "Joseph",
+    "Matthew",
+    "Andrew",
+    "Edward",
+    "Samuel",
+    "Robert",
+    "Christopher",
+    "Stephen",
+    "Richard",
+    "Peter",
+    "Anthony",
+    "Jonathan",
+    "Simon",
+    "Patrick",
+    "Alan",
+    "Paul",
+    "Nicholas",
+    "Timothy",
+    "Philip",
+    "Francis",
+    "Brian",
+    "Kevin",
+    "Martin",
+    "Keith",
+    "Graham",
+    "Terry",
+    "Barry",
+    "Derek",
+    "Adrian",
+    "Wayne",
+    "Gary",
+    "Stuart",
+    "Malcolm",
+    "Gavin",
+    "Darren",
+    "Lee",
+    "Olivia",
+    "Amelia",
+    "Isla",
+    "Ava",
+    "Emily",
+    "Sophia",
+    "Lily",
+    "Isabella",
+    "Mia",
+    "Poppy",
+    "Ella",
+    "Grace",
+    "Freya",
+    "Scarlett",
+    "Chloe",
+    "Daisy",
+    "Alice",
+    "Phoebe",
+    "Matilda",
+    "Charlotte",
+    "Jessica",
+    "Lucy",
+    "Rosie",
+    "Hannah",
+    "Ruby",
+    "Evelyn",
+    "Zoe",
+    "Abigail",
+    "Erin",
+    "Eleanor",
+    "Megan",
+    "Elizabeth",
+    "Victoria",
+    "Laura",
+    "Rachel",
+    "Rebecca",
+    "Nicola",
+    "Louise",
+    "Jennifer",
+    "Susan",
+    "Karen",
+    "Christine",
+    "Pamela",
+    "Wendy",
+    "Angela",
+    "Alison",
+    "Sharon",
+    "Donna",
+    "Sandra",
+    "Diane",
+]
 
 SELF = "robot"
 FOV = 100  # field of view, in degrees
@@ -6,6 +110,20 @@ FOA = 30  # field of attention (eg 'looking at smthg'), in degrees
 
 FAR = 4  # 'far'distance
 CLOSE = 1.5  # 'close distance'
+MEDIUM = 3
+
+TRANSFORM_NAMES = True
+NAMES_MAP = {}
+
+
+def r(name):
+    if not TRANSFORM_NAMES:
+        return name
+
+    if name not in NAMES_MAP:
+        NAMES_MAP[name] = random.choice(NAMES)
+
+    return NAMES_MAP[name]
 
 
 def relative_motion(ag, base):
@@ -48,12 +166,13 @@ def dist(ag1, ag2):
     # print(f"distance: {d}")
 
     if d < CLOSE:
-        return "close to"
+        return CLOSE, "{ag} is close to {ref}"
 
     if d > FAR:
-        return "far from"
+        # return "{r(ag)} is far from {r(ref)}"
+        return FAR, ""
 
-    return ""
+    return MEDIUM, "{ag} is not far from {ref}"
 
 
 def is_visible(target, base, fov=FOV):
@@ -83,7 +202,7 @@ def describe(scene, seen_by=SELF):
 
     ref = agents[seen_by]
 
-    desc = ""
+    desc = set()
 
     for name, ag in agents.items():
 
@@ -98,30 +217,38 @@ def describe(scene, seen_by=SELF):
         # desc += f"{seen_by} sees {name}; "
         motion = relative_motion(ag, ref)
         if motion:
-            desc += motion.format(ag=name, ref=seen_by) + "; "
+            desc.add(motion.format(ag=r(name), ref=r(seen_by)))
 
-        distance = dist(ag, ref)
-        if distance:
-            desc += f"{name} is {distance} {seen_by}; "
+        distance, dist_desc = dist(ag, ref)
+        if dist_desc:
+            desc.add(dist_desc.format(ag=r(name), ref=r(seen_by)))
 
         if ag["talking"]:
-            desc += f"{name} is talking; "
+            desc.add(f"{r(name)} is talking")
 
         for target_name, tg in agents.items():
 
             if target_name == name:
                 continue
 
-            distance = dist(tg, ag)
-            # add 'looking at' only if A is not far from B
-            if "far" not in distance:
+            if not is_visible(tg, ag, fov=FOV):
+                continue
+
+            distance, _ = dist(tg, ag)
+            if distance in [CLOSE, MEDIUM]:
 
                 AseesB = is_visible(tg, ag, fov=FOA)
                 BseesA = is_visible(ag, tg, fov=FOA)
 
-                if AseesB and BseesA:
-                    desc += f"{name} and {target_name} are looking at each other; "
-                elif AseesB:
-                    desc += f"{name} is looking at {target_name}; "
+                if AseesB:
+                    if BseesA:
+                        names = sorted([name, target_name])
+                        desc.add(
+                            f"{r(names[0])} and {r(names[1])} are looking at each other"
+                        )
+                    else:
+                        desc.add(f"{r(name)} is looking at {r(target_name)}")
+                else:
+                    desc.add(f"{r(name)} is not looking at {r(target_name)}")
 
-    return desc
+    return "; ".join(x for x in desc)

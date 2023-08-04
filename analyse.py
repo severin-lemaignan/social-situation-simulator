@@ -5,6 +5,7 @@ import json
 import csv
 import argparse
 
+import generate_description
 from generate_description import describe
 
 DEFAULT_INTERPOLATION_FREQUENCY = 2  # Hz
@@ -120,6 +121,8 @@ def to_json(situation):
 
 def to_csv(csv_file, situation, window_length, sampling_rate):
 
+    generate_description.TRANSFORM_NAMES = False
+
     rows = []
 
     for ts, v in situation.items():
@@ -140,7 +143,7 @@ def to_csv(csv_file, situation, window_length, sampling_rate):
             )
 
             descriptions = [describe(f, seen_by=name) for f in reversed(frames)]
-            rows.append([engaged, name] + descriptions)
+            rows.append([engaged, generate_description.r(name)] + descriptions)
 
     header = ["engaged", "viewed_by"] + [
         "t-%s" % ts
