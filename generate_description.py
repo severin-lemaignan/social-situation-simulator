@@ -4,6 +4,40 @@ SELF = "robot"
 FOV = 100  # field of view, in degrees
 FOA = 30  # field of attention (eg 'looking at smthg'), in degrees
 
+FAR = 4  # 'far'distance
+CLOSE = 1.5  # 'close distance'
+
+
+def relative_motion(ag, base):
+    vx = ag["vx"]
+    vy = ag["vy"]
+    norm_v = math.sqrt(vx ** 2 + vy ** 2)
+
+    # agent is ~static?
+    if norm_v < 0.2:
+        return ""
+
+    dx = ag["x"] - base["x"]
+    dy = ag["y"] - base["y"]
+    norm_d = math.sqrt(dx ** 2 + dy ** 2)
+
+    # agent is too far or too close to describe relative motion
+    if norm_d > FAR or norm_d < CLOSE:
+        return ""
+
+    dot = vx * dx + vy * dy
+
+    cos = dot / (norm_d * norm_v)
+
+    if cos < -0.7:
+        return "{ag} is walking towards {ref}"
+    if cos > 0.7:
+        return "{ag} is walking away from {ref}"
+    if abs(cos) < 0.3:
+        return "{ag} is passing by"
+
+    return ""
+
 
 def dist(ag1, ag2):
 
@@ -13,10 +47,10 @@ def dist(ag1, ag2):
     )
     # print(f"distance: {d}")
 
-    if d < 1:
+    if d < CLOSE:
         return "close to"
 
-    if d > 4:
+    if d > FAR:
         return "far from"
 
     return ""
@@ -62,6 +96,9 @@ def describe(scene, seen_by=SELF):
         # print(f"{name} visible")
 
         # desc += f"{seen_by} sees {name}; "
+        motion = relative_motion(ag, ref)
+        if motion:
+            desc += motion.format(ag=name, ref=seen_by) + "; "
 
         distance = dist(ag, ref)
         if distance:
