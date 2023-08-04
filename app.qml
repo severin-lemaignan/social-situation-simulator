@@ -78,19 +78,24 @@ ApplicationWindow {
 
     // draw the background grid
     Repeater {
-        model:10
-        Rectangle {
-
-            x: simulator.width/2 - width/2
-            y: simulator.height/2 - height/2
-
-            width: m2px * 2 * (index + 1);
-            height:width;
-            radius:width/2
-
-            color:"transparent"
-            border.width:2
-            border.color: "#ddd"
+        id: grid
+        model: Math.max(simulator.width/m2px, simulator.height/m2px) + 1
+        Item {
+            anchors.fill: parent
+            Rectangle {
+                x: 0
+                y: index * m2px
+                width: simulator.width;
+                height:2;
+                color:"#ddd"
+            }
+            Rectangle {
+                y: 0
+                x: index * m2px
+                height: simulator.width;
+                width:2;
+                color:"#ddd"
+            }
         }
     }
     MouseArea {
