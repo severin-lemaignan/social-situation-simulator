@@ -210,10 +210,8 @@ def describe(scene, seen_by=SELF, random_names=True):
     global TRANSFORM_NAMES
     TRANSFORM_NAMES = random_names
 
-    print(f"At {scene['ts']}s:")
     agents = scene["scene"]
 
-    # # only describe if the robot is present in the scene
     if seen_by not in agents:
         print("%s not in the scene. Can not generate description" % seen_by)
         return ""
@@ -228,11 +226,7 @@ def describe(scene, seen_by=SELF, random_names=True):
             continue
 
         if not is_visible(ag, ref):
-            # print(f"{name} not visible")
             continue
-        # print(f"{name} visible")
-
-        # desc += f"{seen_by} sees {name}; "
 
         motion = relative_motion(ag, ref)
 
@@ -252,7 +246,6 @@ def describe(scene, seen_by=SELF, random_names=True):
                 continue
 
             if not is_visible(tg, ref, fov=FOV):
-                print(f"{seen_by} can not see {target_name}")
                 continue
 
             if not is_visible(tg, ag, fov=FOV):
