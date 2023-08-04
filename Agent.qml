@@ -141,18 +141,20 @@ Item {
         opacity: 0.5
     }
 
-    Button {
+    Image {
         id: speech_bubble
-        icon.name: "user-idle-symbolic"
-        visible: talking
-        x: -20
+        source: talking ? "res/speech-bubble-active.svg" : "res/speech-bubble.svg"
+        width:15
+        height:15
+        x: -15
         y: -50
-        background:Item{} 
-        focusPolicy: Qt.NoFocus
 
-        onClicked: {
-            talking=false;
-            timeline.updateKeyframe();
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                talking=!talking;
+                timeline.updateKeyframe();
+            }
         }
     }
 
