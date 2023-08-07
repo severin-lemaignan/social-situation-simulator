@@ -269,4 +269,7 @@ def describe(scene, seen_by=SELF, random_names=True):
                     pass
                     # desc.add(f"{r(name)} is not looking at {r(target_name)}")
 
+    if len(desc) == 0:
+        desc = ["no one is around"]
+
     return "; ".join(x for x in desc)
