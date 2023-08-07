@@ -119,7 +119,7 @@ def to_json(situation):
     return json.dumps({to_str(k): v for k, v in situation.items()})
 
 
-def to_csv(csv_file, situation, window_length, sampling_rate, random_name=False):
+def to_csv(csv_file, situation, window_length, sampling_rate, random_name=True):
 
     rows = []
 
@@ -180,6 +180,12 @@ if __name__ == "__main__":
         % DEFAULT_WINDOW_LENGTH,
     )
     parser.add_argument(
+        "-r",
+        "--random-names",
+        action="store_true",
+        help="if set, use random names for the agents.",
+    )
+    parser.add_argument(
         "-j",
         "--json",
         type=str,
@@ -216,7 +222,13 @@ if __name__ == "__main__":
 
     if args.csv:
         with open(args.csv, "w") as f:
-            to_csv(f, resampled, args.window_length, args.sampling_rate)
+            to_csv(
+                f,
+                resampled,
+                args.window_length,
+                args.sampling_rate,
+                random_name=args.random_names,
+            )
 
     elif args.json:
         with open(args.json, "w") as f:
