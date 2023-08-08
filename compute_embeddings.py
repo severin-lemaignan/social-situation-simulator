@@ -15,11 +15,17 @@ from analyse import DEFAULT_INTERPOLATION_FREQUENCY, DEFAULT_WINDOW_LENGTH
 
 
 NAMES = [
+    "Alice",
     "Oliver",
+    "Phoebe",
     "George",
+    "Matilda",
     "William",
+    "Charlotte",
     "Jack",
+    "Jessica",
     "James",
+    "Lucy",
     "Thomas",
     "Charlie",
     "Harry",
@@ -118,9 +124,12 @@ NAMES = [
 ]
 
 
-def realise_names(desc):
+def realise_names(desc, randomise=True):
 
-    mapping = {k: random.choice(NAMES) for k in "ABCDEFGHIJKLMNOPQRSTUVW"}
+    if randomise:
+        mapping = {k: random.choice(NAMES) for k in "ABCDEFGHIJKLMNOPQRSTUVW"}
+    else:
+        mapping = {k: NAMES[i] for i, k in enumerate("ABCDEFGHIJKLMNOPQRSTUVW")}
 
     return [d.format(**mapping) for d in desc]
 
@@ -147,6 +156,12 @@ if __name__ == "__main__":
         description="Extract social scene descriptions and compute corresponding embeddings"
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="if set, does not actually compute embeddings, using fake static data instead. No data is saved either.",
+    )
+
+    parser.add_argument(
         "-s",
         "--sampling-rate",
         type=float,
@@ -163,6 +178,11 @@ if __name__ == "__main__":
         default=DEFAULT_WINDOW_LENGTH,
         help="(secs) length of the window for which descriptions are generated before each point. Default to %ss."
         % DEFAULT_WINDOW_LENGTH,
+    )
+    parser.add_argument(
+        "--random-names",
+        action="store_true",
+        help="if set, the descriptions all use different names. If not, always the same names are used.",
     )
 
     parser.add_argument(
@@ -224,9 +244,14 @@ if __name__ == "__main__":
 
                 if desc not in embeddings:
                     print("Computing embedding of %s..." % desc)
-                    realised_desc, realised_viewed = realise_names([desc, viewed_by])
-                    # emb = embeddings_model.embed_query(realised_desc)
-                    emb = [1, 1, 1, 1]
+                    realised_desc, realised_viewed = realise_names(
+                        [desc, viewed_by], randomise=args.random_names
+                    )
+
+                    if args.dry_run:
+                        emb = [0.1, 0.001, 0.81, 0.92]
+                    else:
+                        emb = embeddings_model.embed_query(realised_desc)
 
                     embeddings[desc] = {
                         "group": group_id,
@@ -247,11 +272,13 @@ if __name__ == "__main__":
     df_embeddings = pd.DataFrame.from_dict(embeddings, orient="index").reset_index(
         drop=True
     )
-    df_embeddings.to_csv(args.dest)
 
-    print("Successfully saved embeddings to %s" % args.dest)
-
-    # print(df_embeddings)
+    if args.dry_run:
+        print("DRY RUN, not saving the data")
+        print(df_embeddings)
+    else:
+        df_embeddings.to_csv(args.dest)
+        print("Successfully saved embeddings to %s" % args.dest)
 
     # for g in groups:
     #    print(g)
