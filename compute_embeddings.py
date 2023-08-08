@@ -13,6 +13,7 @@ from langchain.embeddings import LlamaCppEmbeddings
 
 from analyse import DEFAULT_INTERPOLATION_FREQUENCY, DEFAULT_WINDOW_LENGTH
 
+CONTEXT = "This is the description of a social setting with a few people: {desc}. We want to generate a good description of the situation."
 
 NAMES = [
     "Alice",
@@ -264,7 +265,9 @@ if __name__ == "__main__":
                 if args.dry_run:
                     emb = [0.1, 0.001, 0.81, 0.92]
                 else:
-                    emb = embeddings_model.embed_query(realised_desc)
+                    emb = embeddings_model.embed_query(
+                        CONTEXT.format(desc=realised_desc)
+                    )
 
                 embeddings[desc] = {
                     "group": group_id,
