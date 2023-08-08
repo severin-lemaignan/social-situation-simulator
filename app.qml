@@ -16,9 +16,23 @@ ApplicationWindow {
 
     property double m2px: 100 // 100px = 1m
 
-    Bridge {
-        id: bridge
+    required property Bridge bridge
 
+    Connections {
+        target: bridge
+        function onSceneRefresh(frame) {
+                try {
+                    const f = JSON.parse(frame);
+                    timeline.setScene(f["scene"]);
+                    if ("seen_by" in f) {
+                        agents.unselectAll();
+                        agents.select(f["seen_by"]);
+                    }
+                }
+                catch (e) {
+                    console.log("Invalid code");
+                }
+        }
     }
 
     header: ToolBar {

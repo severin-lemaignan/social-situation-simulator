@@ -3,6 +3,15 @@
 import sys
 
 import os
+import argparse
+
+try:
+    import rospy
+    from std_msgs.msg import String
+
+    HAS_ROS = True
+except ImportError:
+    HAS_ROS = False
 
 # allow QML to access local file for read/save simulations
 os.environ["QML_XHR_ALLOW_FILE_READ"] = "1"
@@ -40,7 +49,7 @@ agents = {}
 @QmlElement
 class Bridge(QObject):
 
-    _scene_changed = Signal()
+    sceneRefresh = Signal(str, arguments=["frame"])
 
     def __init__(self):
         super().__init__()
@@ -71,10 +80,14 @@ class Bridge(QObject):
     def decode(self, base64_desc):
 
         try:
-            scene = minify.decode(base64_desc)
-            return json.dumps(scene)
+            frame = minify.decode(base64_desc)
+            return json.dumps(frame)
         except Exception as e:
             return ""
+
+    @Slot()
+    def setScene(self, frame):
+        self.sceneRefresh.emit(json.dumps(frame))
 
     @Slot(str)
     def describe(self, json_situation):
@@ -92,8 +105,38 @@ class Bridge(QObject):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(description="Social situation simulator")
+
+    if HAS_ROS:
+        parser.add_argument(
+            "--scene-topic",
+            type=str,
+            default="/socialsituation",
+            help="if set, subscribe to this topic for incoming scene 'short codes'.",
+        )
+
+    args = parser.parse_args()
+
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
+
+    bridge = Bridge()
+
+    engine.setInitialProperties({"bridge": bridge})
+
+    def on_incoming_social_situation(msg):
+
+        b64 = msg.data
+
+        frame = minify.decode(b64)
+        # print(frame)
+        bridge.setScene(frame)
+
+    if HAS_ROS:
+        rospy.init_node("social_simulation_simulator", anonymous=True)
+        rospy.Subscriber(
+            args.scene_topic, String, on_incoming_social_situation, queue_size=1
+        )
 
     qml_file = Path(__file__).parent / "app.qml"
     engine.load(qml_file)
