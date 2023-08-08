@@ -49,9 +49,11 @@ of these descriptions.
 Check `./compute_embeddings.py --help` for all the options.
 
 For instance, the following call will parse all the descriptions in
-`situation_1-normalised-egocentric.csv`, and for each unique one, randomly
-assign names to the template, and compute the resulting embedding (currently
-using OpenAI `text-embedding-ada-002`):
+`situation_1-normalised-egocentric.csv`.
+Then, for each unique one:
+ - it creates random 'variations' by randomizing the order of the descriptors;
+ - replace with name templates with random names;
+ - compute the resulting embedding (currently using OpenAI `text-embedding-ada-002`)
 
 ```
 ./compute_embeddings.py situation_1-normalised-egocentric.csv situation_1-normalised-egocentric-embeddings.csv
