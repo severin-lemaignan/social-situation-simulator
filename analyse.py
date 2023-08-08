@@ -4,6 +4,7 @@ import numpy as np
 import json
 import csv
 import argparse
+from canonical_descriptions import canonize
 
 import generate_description
 from generate_description import describe
@@ -119,7 +120,14 @@ def to_json(situation):
     return json.dumps({to_str(k): v for k, v in situation.items()})
 
 
-def to_csv(csv_file, situation, window_length, sampling_rate, random_name=True):
+def to_csv(
+    csv_file,
+    situation,
+    window_length,
+    sampling_rate,
+    egocentric=True,
+    normalised_names=True,
+):
 
     rows = []
 
@@ -141,10 +149,28 @@ def to_csv(csv_file, situation, window_length, sampling_rate, random_name=True):
             )
 
             descriptions = [
-                describe(f, seen_by=name, random_names=random_name)
+                describe(
+                    f,
+                    seen_by=name,
+                    egocentric=egocentric,
+                    normalise_names=normalised_names,
+                )
                 for f in reversed(frames)
             ]
-            rows.append([engaged, generate_description.r(name), ts] + descriptions)
+
+            canonical_descriptions, mapping = canonize(
+                descriptions, maintain_mapping=False
+            )
+            seen_by = generate_description.r(name)
+            if seen_by[1:-1] in mapping:
+                seen_by = "{%s}" % seen_by[1:-1]
+            else:
+                # name not present in the mapping because 'self' was not part
+                # of any description. In that case, simply add 'as it', since
+                # it was not transformed.
+                pass
+
+            rows.append([engaged, seen_by, ts] + canonical_descriptions)
 
     header = ["engaged", "viewed_by", "actual_ts"] + [
         "t-%s" % ts
@@ -181,9 +207,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-r",
-        "--random-names",
+        "--original-names",
         action="store_true",
-        help="if set, use random names for the agents.",
+        help="if set, use simulator names for the agents. If not, names are normalised to abstract values.",
+    )
+    parser.add_argument(
+        "--egocentric",
+        action="store_true",
+        help="if set, the descriptions are egocentric (eg, uses 'I', 'me' to talk about the agent describing the scene).",
     )
     parser.add_argument(
         "-j",
@@ -227,7 +258,8 @@ if __name__ == "__main__":
                 resampled,
                 args.window_length,
                 args.sampling_rate,
-                random_name=args.random_names,
+                egocentric=args.egocentric,
+                normalised_names=not args.original_names,
             )
 
     elif args.json:

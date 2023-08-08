@@ -123,7 +123,8 @@ def r(name):
         return name
 
     if name not in NAMES_MAP:
-        NAMES_MAP[name] = random.choice(NAMES)
+        # NAMES_MAP[name] = random.choice(NAMES)
+        NAMES_MAP[name] = "{%s}" % "ABCDEFGHIJKLMNOPQRSTUVW"[len(NAMES_MAP)]
 
     return NAMES_MAP[name]
 
@@ -205,10 +206,10 @@ def is_visible(target, base, fov=FOV):
         return False
 
 
-def describe(scene, seen_by=SELF, random_names=True):
+def describe(scene, seen_by=SELF, egocentric=True, normalise_names=True):
 
     global TRANSFORM_NAMES
-    TRANSFORM_NAMES = random_names
+    TRANSFORM_NAMES = normalise_names
 
     agents = scene["scene"]
 
@@ -228,14 +229,19 @@ def describe(scene, seen_by=SELF, random_names=True):
         if not is_visible(ag, ref):
             continue
 
+        if egocentric:
+            seen_by_name = "me"
+        else:
+            seen_by_name = r(seen_by)
+
         motion = relative_motion(ag, ref)
 
         if motion:
-            desc.add(motion.format(ag=r(name), ref=r(seen_by)))
+            desc.add(motion.format(ag=r(name), ref=seen_by_name))
 
         distance, dist_desc = dist(ag, ref)
         if dist_desc:
-            desc.add(dist_desc.format(ag=r(name), ref=r(seen_by)))
+            desc.add(dist_desc.format(ag=r(name), ref=seen_by_name))
 
         if ag["talking"]:
             desc.add(f"{r(name)} is talking")
@@ -260,11 +266,18 @@ def describe(scene, seen_by=SELF, random_names=True):
                 if AseesB:
                     if BseesA:
                         names = sorted([name, target_name])
-                        desc.add(
-                            f"{r(names[0])} and {r(names[1])} are looking at each other"
-                        )
+
+                        if egocentric and target_name == seen_by:
+                            desc.add(f"{r(name)} and I are looking at each other")
+                        else:
+                            desc.add(
+                                f"{r(names[0])} and {r(names[1])} are looking at each other"
+                            )
                     else:
-                        desc.add(f"{r(name)} is looking at {r(target_name)}")
+                        if egocentric and target_name == seen_by:
+                            desc.add(f"{r(name)} is looking at me")
+                        else:
+                            desc.add(f"{r(name)} is looking at {r(target_name)}")
                 else:
                     pass
                     # desc.add(f"{r(name)} is not looking at {r(target_name)}")
