@@ -18,7 +18,7 @@ def encode(frame):
 
         cmpstr = zlib.compress(desc.encode("utf-8"))
 
-        return base64.b64encode(cmpstr)
+        return base64.b64encode(cmpstr).decode("ascii")
     except Exception:
         return ""
 

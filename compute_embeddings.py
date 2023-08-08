@@ -221,6 +221,7 @@ if __name__ == "__main__":
     groups = []
     all_descriptions = list(embeddings.keys())
 
+    new_embeddings = 0
     for _, row in df.iterrows():
 
         engaged = row["engaged"]
@@ -228,6 +229,7 @@ if __name__ == "__main__":
         viewed_by = row["viewed_by"]
         for t in ts:
             desc = row["t-%s" % t]
+            short_code = row["t-%s-short-code" % t]
 
             if desc not in groups:
                 groups.append(desc)
@@ -238,41 +240,42 @@ if __name__ == "__main__":
 
             for desc in variations:
                 if desc in all_descriptions:
+                    # do not recomputed the embedding, but update the 'engaged' status if it is 'true'
+                    if t == 0.0 and engaged:
+                        embeddings[desc]["engaged"] = engaged
                     continue
 
                 all_descriptions.append(desc)
 
-                if desc not in embeddings:
-                    realised_desc, realised_viewed = realise_names(
-                        [desc, viewed_by], randomise=args.random_names
-                    )
-                    print("Computing embedding of <%s>..." % realised_desc)
+                new_embeddings += 1
+                realised_desc, realised_viewed = realise_names(
+                    [desc, viewed_by], randomise=args.random_names
+                )
+                print("Computing embedding of <%s>..." % realised_desc)
 
-                    if args.dry_run:
-                        emb = [0.1, 0.001, 0.81, 0.92]
-                    else:
-                        emb = embeddings_model.embed_query(realised_desc)
-
-                    embeddings[desc] = {
-                        "group": group_id,
-                        "engaged": engaged if t == 0.0 else 0,
-                        "ts": actual_ts - t,
-                        "viewed_by": viewed_by,
-                        "viewed_by_name": realised_viewed,
-                        "template": desc,
-                        "desc": realised_desc,
-                    }
-                    for i, v in enumerate(emb):
-                        embeddings[desc][str(i)] = v
+                if args.dry_run:
+                    emb = [0.1, 0.001, 0.81, 0.92]
                 else:
-                    # do not recomputed the embedding, but update the 'engaged' status if it is 'true'
-                    if t == 0.0 and engaged:
-                        embeddings[desc]["engaged"] = engaged
+                    emb = embeddings_model.embed_query(realised_desc)
+
+                embeddings[desc] = {
+                    "group": group_id,
+                    "engaged": engaged if t == 0.0 else 0,
+                    "ts": actual_ts - t,
+                    "viewed_by": viewed_by,
+                    "viewed_by_name": realised_viewed,
+                    "template": desc,
+                    "desc": realised_desc,
+                    "short_code": short_code,
+                }
+                for i, v in enumerate(emb):
+                    embeddings[desc][str(i)] = v
 
     df_embeddings = pd.DataFrame.from_dict(embeddings, orient="index").reset_index(
         drop=True
     )
 
+    print("Computed %s new embeddings" % new_embeddings)
     if args.dry_run:
         print("DRY RUN, not saving the data")
         print(df_embeddings)

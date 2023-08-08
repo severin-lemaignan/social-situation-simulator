@@ -8,6 +8,7 @@ from canonical_descriptions import canonize
 
 import generate_description
 from generate_description import describe
+import minify
 
 DEFAULT_INTERPOLATION_FREQUENCY = 2  # Hz
 DEFAULT_WINDOW_LENGTH = 3  # sec -> number of descriptions/embeddings = INTERPOLATION_FREQUENCY x WINDOW_LENGTH
@@ -149,18 +150,30 @@ def to_csv(
             )
 
             descriptions = [
-                describe(
-                    f,
-                    seen_by=name,
-                    egocentric=egocentric,
-                    normalise_names=normalised_names,
+                (
+                    describe(
+                        f,
+                        seen_by=name,
+                        egocentric=egocentric,
+                        normalise_names=normalised_names,
+                    ),
+                    minify.encode({"scene": f["scene"], "seen_by": name}),
                 )
                 for f in reversed(frames)
             ]
 
             canonical_descriptions, mapping = canonize(
-                descriptions, maintain_mapping=False
+                [d for d, _ in descriptions], maintain_mapping=False
             )
+
+            full_descs = [
+                item
+                for pair in zip(
+                    canonical_descriptions, [code for _, code in descriptions]
+                )
+                for item in pair
+            ]
+
             seen_by = generate_description.r(name)
             if seen_by[1:-1] in mapping:
                 seen_by = "{%s}" % seen_by[1:-1]
@@ -170,12 +183,12 @@ def to_csv(
                 # it was not transformed.
                 pass
 
-            rows.append([engaged, seen_by, ts] + canonical_descriptions)
+            rows.append([engaged, seen_by, ts] + full_descs)
 
-    header = ["engaged", "viewed_by", "actual_ts"] + [
-        "t-%s" % ts
-        for ts in list(np.arange(0, window_length + 0.001, 1 / sampling_rate))
-    ]
+    header = ["engaged", "viewed_by", "actual_ts"]
+    for ts in list(np.arange(0, window_length + 0.001, 1 / sampling_rate)):
+        header += ["t-%s" % ts, "t-%s-short-code" % ts]
+
     csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONNUMERIC)
     csv_writer.writerow(header)
     for row in rows:
