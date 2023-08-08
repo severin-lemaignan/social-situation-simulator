@@ -243,10 +243,10 @@ if __name__ == "__main__":
                 all_descriptions.append(desc)
 
                 if desc not in embeddings:
-                    print("Computing embedding of %s..." % desc)
                     realised_desc, realised_viewed = realise_names(
                         [desc, viewed_by], randomise=args.random_names
                     )
+                    print("Computing embedding of <%s>..." % realised_desc)
 
                     if args.dry_run:
                         emb = [0.1, 0.001, 0.81, 0.92]

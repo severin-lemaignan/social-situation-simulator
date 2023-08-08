@@ -72,7 +72,7 @@ class Bridge(QObject):
         print(situation)
         for ts in timestamps:
             print("At %ss:" % ts)
-            desc = describe(situation[ts], random_names=False)
+            desc = describe(situation[ts], normalise_names=False)
             print(desc)
 
 
