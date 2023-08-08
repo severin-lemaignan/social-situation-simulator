@@ -155,6 +155,15 @@ ApplicationWindow {
             }
         }
 
+        function select(name) {
+
+            for (var idx in children) {
+                if (children[idx].name === name) {
+                    children[idx].selected = true;
+                }
+            }
+        }
+
         function getSelected() {
 
             var selected = [];
@@ -268,6 +277,32 @@ ApplicationWindow {
         anchors.rightMargin: 10
         anchors.top: talking_btn.bottom
         anchors.topMargin: 5
+    }
+
+    TextField {
+        anchors.left:parent.left
+        anchors.right:parent.right
+        anchors.bottom: parent.bottom
+        height:40
+        placeholderText: "Paste here scene codes"
+
+        onTextChanged: {
+            if (text !== "") {
+                console.log("Trying to decode " + text + "...");
+                try {
+                    const frame = JSON.parse(bridge.decode(text));
+                    console.log("Scene short code correctly decoded!");
+                    text = "";
+                    timeline.setScene(frame["scene"]);
+                    if ("seen_by" in frame) {
+                        agents.select(frame["seen_by"])
+                    }
+                }
+                catch (e) {
+                    console.log("Invalid code");
+                }
+            }
+        }
     }
 
 

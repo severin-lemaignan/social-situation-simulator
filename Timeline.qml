@@ -168,7 +168,15 @@ Item {
         }
     }
 
+    function setScene(new_scene) {
+        for (var i = 0; i < scene.children.length; i++) {
+            var agent = scene.children[i];
 
+            if (agent.name in new_scene) {
+                agent.deserialize(new_scene[agent.name]);
+            }
+        }
+    }
 
     // interpolate between two objects whose values are numbers, at time t between t_a and t_b
     function interpolate(a,t_a,b,t_b,t) {

@@ -22,7 +22,12 @@ from PySide6.QtQml import QQmlApplicationEngine, QmlElement
 
 import json
 
+# required to encode/decode scenes' 'short code'
+import zlib
+import base64
+
 from generate_description import describe
+import minify
 
 # To be used on the @QmlElement decorator
 # (QML_IMPORT_MINOR_VERSION is optional)
@@ -61,6 +66,15 @@ class Bridge(QObject):
     #        self._scene_changed.emit()
     #        print(self._scene)
     #
+
+    @Slot(str, result=str)
+    def decode(self, base64_desc):
+
+        try:
+            scene = minify.decode(base64_desc)
+            return json.dumps(scene)
+        except Exception as e:
+            return ""
 
     @Slot(str)
     def describe(self, json_situation):
