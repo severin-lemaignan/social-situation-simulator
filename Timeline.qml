@@ -178,6 +178,12 @@ Item {
         }
     }
 
+    function wrap_angle(a) {
+        const r = a % 360;
+        if(r>180) {return r-360}
+        return r;
+    } 
+
     // interpolate between two objects whose values are numbers, at time t between t_a and t_b
     function interpolate(a,t_a,b,t_b,t) {
         const zip = (a,b) => a.map((k, i) => [k, b[i]]);
@@ -203,6 +209,11 @@ Item {
         }
 
         // fixes for 'special' values:
+
+        // wrap angles
+        result.theta = a.theta + (wrap_angle(b.theta-a.theta))/(t_b-t_a)*(t-t_a);
+
+        // speed remain constant between frames
         result.vx = a.vx;
         result.vy = a.vy;
 
