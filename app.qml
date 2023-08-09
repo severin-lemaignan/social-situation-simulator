@@ -33,6 +33,10 @@ ApplicationWindow {
                     console.log("Invalid code");
                 }
         }
+
+        function onRecord(start, end, seen_by, filename) {
+            agents.record(start, end, seen_by, filename);
+        }
     }
 
     header: ToolBar {
@@ -193,6 +197,13 @@ ApplicationWindow {
 
         }
 
+        function setPresentationMode() {
+            for (var idx in children) {
+                var agent = children[idx];
+                agent.presentation_mode = true;
+            }
+        }
+
         function togglePresentationMode() {
             for (var idx in children) {
                 var agent = children[idx];
@@ -260,26 +271,62 @@ ApplicationWindow {
 
 
         Timer {
-        id: recordTimer
-        property int frame: -1
-        interval: 100
-        running: false
-        repeat: true
-        onTriggered: agents.grabToImage(function (result) {
-            frame++;
-            result.saveToFile('imgs/frame_' + pad(recordTimer.frame,5) + '.png');
-        } );
+            id: recordTimer
+            property int frame: -1
+            interval: 1000/15
+            running: false
+            repeat: true
+            property string filename: ""
+            onTriggered: agents.grabToImage(function (result) {
+                frame++;
+                const name = filename.length === 0 ? "imgs/frame": filename
+                result.saveToFile(name + '_' + pad(recordTimer.frame,5) + '.png');
+            } );
 
-        onRunningChanged: {
-            if (running) {frame = -1;}
+            onRunningChanged: {
+                if (running) {frame = -1;}
+            }
+
+            function pad(n, width, z) {
+            z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+            }
         }
 
-        function pad(n, width, z) {
-        z = z || '0';
-        n = n + '';
-        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        Timer {
+            id: stopRecordingTimer
+            interval: 50
+            running: false
+            repeat: true
+            property double end: 0
+
+            onTriggered: {
+                if (timeline.value > end) {
+                    stop();
+                    timeline.stop();
+                    recordTimer.stop()
+                    console.log("Done recording");
+                    agents.togglePresentationMode();
+                }
+            }
         }
-    }
+
+
+        function record(start, end, seen_by="", filename="") {
+            recordTimer.stop();
+            stopRecordingTimer.stop()
+
+            if (seen_by.length != 0) {unselectAll();select(seen_by);}
+            setPresentationMode();
+            timeline.value = start;
+            recordTimer.filename = filename;
+            stopRecordingTimer.end = end
+            stopRecordingTimer.start()
+            recordTimer.start();
+            timeline.play();
+        }
+
 
     }
     Button {
@@ -331,12 +378,13 @@ ApplicationWindow {
         focusPolicy: Qt.NoFocus
         Material.accent: recordTimer.running ? Material.Green : Material.Accent
         onClicked: {
-            if (!recordTimer.running) {
-                recordTimer.start();
-            }
-            else {
-                recordTimer.stop();
-            }
+            //if (!recordTimer.running) {
+            //    recordTimer.start();
+            //}
+            //else {
+            //    recordTimer.stop();
+            //}
+            agents.record(3.0, 10.0);
         }
         anchors.right: parent.right
         anchors.rightMargin: 10
