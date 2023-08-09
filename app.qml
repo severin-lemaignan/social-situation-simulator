@@ -126,6 +126,7 @@ ApplicationWindow {
     Item {
         focus:true
         id:agents
+        anchors.fill:parent
 
         Component.onCompleted: {
             addAgent("robot")
@@ -257,6 +258,29 @@ ApplicationWindow {
             }
         }
 
+
+        Timer {
+        id: recordTimer
+        property int frame: -1
+        interval: 100
+        running: false
+        repeat: true
+        onTriggered: agents.grabToImage(function (result) {
+            frame++;
+            result.saveToFile('imgs/frame_' + pad(recordTimer.frame,5) + '.png');
+        } );
+
+        onRunningChanged: {
+            if (running) {frame = -1;}
+        }
+
+        function pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+    }
+
     }
     Button {
         id: add_agent_btn
@@ -300,11 +324,43 @@ ApplicationWindow {
         anchors.topMargin: 5
     }
 
+    Button {
+        id: record_btn
+        icon.name: "media-record-symbolic"
+        highlighted: true
+        focusPolicy: Qt.NoFocus
+        Material.accent: recordTimer.running ? Material.Green : Material.Accent
+        onClicked: {
+            if (!recordTimer.running) {
+                recordTimer.start();
+            }
+            else {
+                recordTimer.stop();
+            }
+        }
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
+    }
+    Button {
+        id: hide_btn
+        icon.name: "semi-starred-symbolic-rtl"
+        highlighted: true
+        focusPolicy: Qt.NoFocus
+        Material.accent: Material.Accent
+        onClicked: agents.togglePresentationMode()
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottom: record_btn.top
+        anchors.bottomMargin: 5
+    }
+
     TextField {
         anchors.left:parent.left
-        anchors.right:parent.right
         anchors.bottom: parent.bottom
         height:40
+        width:300
         placeholderText: "Paste here scene codes"
 
         onTextChanged: {
