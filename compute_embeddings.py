@@ -203,26 +203,45 @@ if __name__ == "__main__":
     parser.add_argument(
         "dest",
         type=str,
-        help="CSV file containing the computed embeddings. If the file already exists, embeddings for new descriptions will be added to it.",
+        help="Path where the CSV file containing the computed embeddings will be stored. Name is generated based on passed options. If the file already exists, embeddings for new descriptions will be added to it.",
     )
 
     args = parser.parse_args()
 
-    embeddings_model = OpenAIEmbeddings()
-    # embeddings_model = LlamaCppEmbeddings(
-    #    model_path="/home/severinlemaignan/src/llama.cpp/models/llama-2-13b-chat.ggmlv3.q4_0.bin"
-    # )
+    USE_CONTEXT = True
 
+    OPENAI = "openai-ada-002"
+    LLAMA2 = "llama2-13B-q4"
+    engine = OPENAI
+
+    if engine == OPENAI:
+        embeddings_model = OpenAIEmbeddings()
+    elif engine == LLAMA2:
+        embeddings_model = LlamaCppEmbeddings(
+            model_path="/home/severinlemaignan/src/llama.cpp/models/llama-2-13b-chat.ggmlv3.q4_0.bin"
+        )
+    else:
+        assert False
+
+    output_filename = Path(args.dest) / (
+        "embeddings-"
+        + engine
+        + ("-random-names" if args.random_names else "-stable-names")
+        + ("-no-variations" if args.max_variations == 0 else "-variations")
+        + ("-context" if USE_CONTEXT else "")
+        + ".csv"
+    )
     df = pd.read_csv(args.src)
 
     # pre-load previous embeddings
-    if Path(args.dest).exists():
-        print("%s already exist. Adding new embeddings to it." % args.dest)
-        embeddings_df = pd.read_csv(args.dest, index_col=0)
+    if output_filename.exists():
+        print("%s already exist. Adding new embeddings to it." % output_filename)
+        embeddings_df = pd.read_csv(output_filename, index_col=0)
         embeddings = {
             row["template"]: row.to_dict() for _, row in embeddings_df.iterrows()
         }
     else:
+        print("Embeddings will be saved to %s" % output_filename)
         embeddings = {}
 
     ts = np.arange(0, args.window_length + 0.001, 1 / args.sampling_rate)
@@ -267,6 +286,8 @@ if __name__ == "__main__":
                 else:
                     emb = embeddings_model.embed_query(
                         CONTEXT.format(desc=realised_desc)
+                        if USE_CONTEXT
+                        else realised_desc
                     )
 
                 embeddings[desc] = {
@@ -291,8 +312,8 @@ if __name__ == "__main__":
         print("DRY RUN, not saving the data")
         print(df_embeddings)
     else:
-        df_embeddings.to_csv(args.dest)
-        print("Successfully saved embeddings to %s" % args.dest)
+        df_embeddings.to_csv(output_filename)
+        print("Successfully saved embeddings to %s" % output_filename)
 
     # for g in groups:
     #    print(g)
