@@ -8,10 +8,10 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   height="16"
+   height="40"
    id="svg7384"
    version="1.1"
-   width="16"
+   width="40"
    sodipodi:docname="speech-bubble.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
   <sodipodi:namedview
@@ -27,19 +27,20 @@
      inkscape:window-height="1016"
      id="namedview23"
      showgrid="false"
-     inkscape:zoom="14.75"
-     inkscape:cx="-13.627119"
-     inkscape:cy="7.661017"
+     inkscape:zoom="10.429825"
+     inkscape:cx="23.227991"
+     inkscape:cy="20.220425"
      inkscape:window-x="1920"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer9" />
+     inkscape:current-layer="layer9"
+     inkscape:snap-global="false" />
   <metadata
      id="metadata20854">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
-        <dc:title />
+        <dc:title></dc:title>
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
@@ -81,56 +82,63 @@
      id="layer9"
      label="status"
      style="display:inline;fill:#000000"
-     transform="translate(-1253.0002,307)">
+     transform="translate(-1253.0002,331)">
     <path
-       d="m 1255.0002,-306 c -1.108,0 -2,0.892 -2,2 v 8 c 0,1.108 0.892,2 2,2 h 1.5215 l 2.4785,3 2,-3 h 6 c 1.108,0 2,-0.892 2,-2 v -8 c 0,-1.108 -0.892,-2 -2,-2 z m 0,1 h 12 c 0.554,0 1,0.446 1,1 v 8 c 0,0.554 -0.446,1 -1,1 h -6.434 l -1.566,2.4 -1.966,-2.4 h -2.034 c -0.554,0 -1,-0.446 -1,-1 v -8 c 0,-0.554 0.446,-1 1,-1 z m -0.6992,11 c 0.1519,0.0168 0.3208,0.0211 0.5234,0 z"
+       inkscape:connector-curvature="0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.08750001;enable-background:new"
+       id="path829"
+       d="m 1258.6317,-327.57276 c -2.6418,0 -4.7686,2.12675 -4.7686,4.7685 v 19.07401 c 0,2.64175 2.1268,4.7685 4.7686,4.7685 h 3.6276 l 5.9093,7.15276 4.7686,-7.15276 h 14.3055 c 2.6417,0 4.7685,-2.12675 4.7685,-4.7685 v -19.07401 c 0,-2.64175 -2.1268,-4.7685 -4.7685,-4.7685 z m 9.5369,31.94896 c -9.537,2.54322 -4.7684,1.27161 0,0 z m -11.204,-3.33795 c 0.3621,0.0401 0.7649,0.0503 1.2479,0 z"
+       sodipodi:nodetypes="sssscccsssssccccc" />
+    <path
+       d="m 1257.9845,-328.38174 c -2.7613,0 -4.9843,2.22297 -4.9843,4.98423 v 19.93692 c 0,2.76126 2.223,4.98423 4.9843,4.98423 h 3.7917 l 6.1767,7.47635 4.9843,-7.47635 h 14.9527 c 2.7612,0 4.9842,-2.22297 4.9842,-4.98423 v -19.93692 c 0,-2.76126 -2.223,-4.98423 -4.9842,-4.98423 z m 0,2.49211 h 29.9054 c 1.3806,0 2.4921,1.11149 2.4921,2.49212 v 19.93692 c 0,1.38063 -1.1115,2.49212 -2.4921,2.49212 h -16.0343 l -3.9027,5.98107 -4.8995,-5.98107 h -5.0689 c -1.3807,0 -2.4921,-1.11149 -2.4921,-2.49212 v -19.93692 c 0,-1.38063 1.1114,-2.49212 2.4921,-2.49212 z m -1.7425,27.41327 c 0.3785,0.0419 0.7995,0.0526 1.3044,0 z"
        id="path999-7-7"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;opacity:0.554;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0875;enable-background:new" />
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:125%;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;opacity:0.55400002;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.08750001;enable-background:new"
+       inkscape:connector-curvature="0" />
     <rect
-       height="1"
+       height="2.4921153"
        id="rect6051-9-4"
        rx="0.25"
        ry="0.25"
        style="opacity:0.5;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       width="10"
-       x="1256.0002"
-       y="-303" />
+       width="24.921152"
+       x="1260.4767"
+       y="-320.9054" />
     <rect
-       height="1"
+       height="2.4921153"
        id="rect6051-4-2-5"
        rx="0.25"
        ry="0.25"
        style="opacity:0.5;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       width="7"
-       x="1256.0002"
-       y="-301" />
+       width="17.444807"
+       x="1260.4767"
+       y="-315.92117" />
   </g>
   <g
      id="layer2"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="layer4"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="g1812"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="g6217"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="layer3"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="g1833"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-1012,-60)" />
+     transform="translate(-1012,-36)" />
 </svg>

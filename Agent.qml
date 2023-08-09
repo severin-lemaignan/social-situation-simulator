@@ -31,23 +31,34 @@ Item {
     property bool talking: false
     property var engaged_with: []
 
+    // when true, hide all the details and use unique color
+    // useful to prepare eg video clips
+    property bool presentation_mode: false
+
     // handle to the timeline, used to enable/disable 'talking'
     property var timeline;
 
+    z: selected? 1000:0
+
     FoV {
-        width: 200
-        height: 200
+        width: 2000
+        height: 2000
         rotation: agent.gaze_direction
         opacity: parent.selected ? 1 : 0.5
         fov: 100
         foa: 30
+        radius: 100
         x: parent.width/2-width/2
         y: parent.height/2-height/2
+        fovVisible: !presentation_mode
+        outOfFov: selected
 
 
         Image {
             id: gaze_handle
             source: "res/rotate.svg"
+
+            visible: !presentation_mode
 
             width:30
             height:30
@@ -89,7 +100,7 @@ Item {
         y: - height/2
         source: parent.name === "robot" ? "res/robot_selected.svg" : "res/people_selected.svg" 
 
-        visible: parent.selected
+        visible: parent.selected && !parent.presentation_mode
     }
 
     Image {
@@ -101,8 +112,8 @@ Item {
         transformOrigin: Item.Center
         x: - width/2
         y: - height/2
-        property string color: parent.color
-        source: parent.name === "robot" ? "res/robot.svg" : "res/people_" + color + ".svg" 
+        property string color: presentation_mode ? "blue" : parent.color
+        source: (parent.name === "robot" && !presentation_mode) ? "res/robot.svg" : "res/people_" + color + ".svg" 
 
         Drag.active: dragArea.drag.active
         Drag.hotSpot.x: 10
@@ -139,13 +150,14 @@ Item {
         x: parent.width/2-width/2
         y: parent.height/2-height/2
         opacity: 0.5
+        visible: !presentation_mode
     }
 
     Image {
         id: speech_bubble
-        source: talking ? "res/speech-bubble-active.svg" : "res/speech-bubble.svg"
-        width:15
-        height:15
+        source: talking ? (presentation_mode ? "res/speech-bubble.svg" : "res/speech-bubble-active.svg") : (presentation_mode ? "" : "res/speech-bubble.svg")
+        width:presentation_mode ? 40: 15
+        height:width
         x: -15
         y: -50
 
@@ -161,7 +173,7 @@ Item {
     Button {
         id: engaged
         icon.name: "send-to-symbolic"
-        visible: engaged_with.length !== 0
+        visible: engaged_with.length !== 0 && !presentation_mode
         background: Item{} 
         focusPolicy: Qt.NoFocus
         anchors.left: speech_bubble.right
@@ -183,6 +195,7 @@ Item {
         x: -body.width/2 + 2
         text: "<i>"+name+"</i>"
         color: "#333"
+        visible: !presentation_mode
     }
 
     function serialize() {

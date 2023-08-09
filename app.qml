@@ -192,6 +192,13 @@ ApplicationWindow {
 
         }
 
+        function togglePresentationMode() {
+            for (var idx in children) {
+                var agent = children[idx];
+                agent.presentation_mode = !agent.presentation_mode;
+            }
+        }
+
         function unselectAll() {
             for (var idx in children) {
                 var agent = children[idx];
