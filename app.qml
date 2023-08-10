@@ -284,7 +284,7 @@ ApplicationWindow {
             } );
 
             onRunningChanged: {
-                if (running) {frame = -1;}
+                frame = -1;
             }
 
             function pad(n, width, z) {

@@ -52,12 +52,18 @@ Canvas {
 
 
             if (outOfFov) {
-                ctx.beginPath();
-                ctx.fillStyle = "black";
-                ctx.moveTo(centreX, centreY);
-                ctx.arc(centreX, centreY, radius*10, halfFov, -halfFov, false);
-                ctx.lineTo(centreX, centreY);
-                ctx.fill();
+
+                const gradient = ctx.createConicalGradient(centreX, centreY,0);
+
+                const idx = (fov/2)/360;
+                console.log(idx);
+                gradient.addColorStop(idx - 0.03, "#00000000");
+                gradient.addColorStop(idx, "black");
+                gradient.addColorStop(1-idx, "black");
+                gradient.addColorStop(1-idx+0.03, "#00000000");
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(centreX-10*radius, centreY-10*radius, 20*radius,  20*radius);
             }
     }
 }

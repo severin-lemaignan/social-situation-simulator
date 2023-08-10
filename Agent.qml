@@ -112,7 +112,7 @@ Item {
         transformOrigin: Item.Center
         x: - width/2
         y: - height/2
-        property string color: presentation_mode ? "blue" : parent.color
+        property string color: presentation_mode ? (selected? "orange" : "blue") : parent.color
         source: (parent.name === "robot" && !presentation_mode) ? "res/robot.svg" : "res/people_" + color + ".svg" 
 
         Drag.active: dragArea.drag.active
