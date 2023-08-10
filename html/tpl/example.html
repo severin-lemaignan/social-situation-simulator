@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Social situations</title>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+        <style>
+html,body {
+    background-color: #ccc;
+    margin: 20px;
+    height: 100vh;
+    color: #333;
+    text-align:center;
+}
+.wrapper {
+    display: grid;
+    grid-gap: 10px;
+    height: 50%;
+    align-items: center;
+}
+@media (min-width: 600px) {
+    .wrapper { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+    .wrapper { grid-template-columns: repeat(3, 1fr); }
+}
+
+.box {
+    /*border: 1px solid #222;*/
+    background: #bbb;
+    border-radius: 5px;
+    font-size: 150%;
+    text-align: center;
+
+}
+
+h1 {
+    margin:5px;
+}
+
+p {
+    margin:5px;
+    color: #333;
+}
+
+video {
+
+    width: 80%;
+    max-width: 300px;
+    max-height: 250px;
+}
+
+button {
+    font-size: 15pt;
+    width:30%;
+    display: inline-block;
+}
+    </style>
+</head>
+
+<body>
+    <h1>Example</h1>
+
+
+                
+
+
+
+    <div style="text-align:center; font-size: 20pt;">
+        <p>
+        This is our reference situation: our character is looking at two people chatting together:
+        </p>
+        <video id="vid1" class="ref-video" autoplay muted>
+            <source id="vid1_mp4" src="static/videos/situation_lfe_1.json-7.0-Will.mp4" type="video/mp4" />
+            <source id="vid1_webm" src="static/videos/situation_lfe_1.json-7.0-Will.webm" type="video/webm" />
+        </video>
+    </div>
+    <div class="wrapper">
+        <div class="box d">
+            <p>
+            This one is quite similar: at the end, we see a group two people talking together. <b>You should select this video clip</b>.
+            </p>
+            <video id="vid2" autoplay muted>
+                <source id="vid2_mp4" src="static/videos/situation_lfe_1.json-7.5-Jane.mp4" type="video/mp4" />
+                <source id="vid2_webm" src="static/videos/situation_lfe_1.json-7.5-Jane.webm" type="video/webm" />
+            </video>
+        </div>
+        <div class="box f">
+            <p>
+            This one is less similar: at the end, it looks like one person is simply facing us, with another person on the side.
+            </p>
+            <video id="vid3" autoplay muted>
+                <source id="vid3_mp4" src="static/videos/situation_lfe_1.json-11.0-Jane.mp4" type="video/mp4" />
+                <source id="vid3_webm" src="static/videos/situation_lfe_1.json-11.0-Jane.webm" type="video/webm" />
+            </video>
+        </div>
+        <div class="box" style="background:#00000000">
+            <p>
+            If no situation is similar to the model, you can also choose to skip.
+            </p>
+        </div>
+    </div>
+
+    <button onclick="window.location.href = 'choice'">Let's start</button>
+
+    <script>
+    $('video').hover(function toggleControls() {
+        if (this.hasAttribute("controls")) {
+            this.removeAttribute("controls")
+        } else {
+            this.setAttribute("controls", "controls")
+        }
+    })
+
+
+    </script>
+</body>
+</html>
+

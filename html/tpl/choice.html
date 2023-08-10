@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Social situations</title>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+        <style>
+html,body {
+    background-color: #ccc;
+    margin: 20px;
+    height: 100vh;
+    color: #333;
+}
+.wrapper {
+    display: grid;
+    grid-gap: 10px;
+    height: 50%;
+    align-items: center;
+}
+@media (min-width: 600px) {
+    .wrapper { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+    .wrapper { grid-template-columns: repeat(3, 1fr); }
+}
+
+.box {
+    /*border: 1px solid #222;*/
+    background: #bbb;
+    border-radius: 5px;
+    font-size: 150%;
+    text-align: center;
+
+}
+
+p {
+    margin:5px;
+    color: #333;
+}
+
+video {
+
+    width: 80%;
+    max-width: 400px;
+    max-height: 350px;
+}
+
+button {
+    font-size: 15pt;
+    width:60%;
+    display: inline-block;
+}
+    </style>
+</head>
+
+<body>
+    <div style="text-align:center; font-size: 20pt;">
+        <video id="vid1" class="ref-video" muted>
+            <source id="vid1_mp4" type="video/mp4" />
+            <source id="vid1_webm" type="video/webm" />
+        </video>
+        <p>
+        <b>This social situation is most similar to...</b>
+        </p>
+    </div>
+    <div class="wrapper">
+        <div class="box d">
+            <p>
+            <button id="left">This one</button>
+            </p>
+            <video id="vid2" muted>
+                <source id="vid2_mp4" type="video/mp4" />
+                <source id="vid2_webm" type="video/webm" />
+            </video>
+        </div>
+        <div class="box f">
+            <p>
+            <button id="right">This one</button>
+            </p>
+            <video id="vid3" muted>
+                <source id="vid3_mp4" type="video/mp4" />
+                <source id="vid3_webm" type="video/webm" />
+            </video>
+        </div>
+        <div class="box" style="background:#00000000">
+            <button id="none">Not similar to any of these two</button>
+        </div>
+    </div>
+
+    <script>
+    $('video').hover(function toggleControls() {
+        if (this.hasAttribute("controls")) {
+            this.removeAttribute("controls")
+        } else {
+            this.setAttribute("controls", "controls")
+        }
+    })
+
+    function submitAndGetNext(vid1, vid2, vid3, choice) {
+        $.getJSON("/submit", {vid1: vid1, vid2:vid2, vid3:vid3, choice:choice}, function(data) {
+
+            if ("goto" in data) {
+                window.location.href = data.goto;
+            }
+
+            $("#vid1_mp4").attr("src", data.vid1 + ".mp4");
+            $("#vid1_webm").attr("src", data.vid1 + ".webm");
+            $("#vid2_mp4").attr("src", data.vid2 + ".mp4");
+            $("#vid2_webm").attr("src", data.vid2 + ".webm");
+            $("#vid3_mp4").attr("src", data.vid3 + ".mp4");
+            $("#vid3_webm").attr("src", data.vid3 + ".webm");
+
+            $("#vid1").get(0).load();
+            $("#vid2").get(0).load();
+            $("#vid3").get(0).load();
+            $("#vid1").get(0).play();
+            $("#vid2").get(0).play();
+            $("#vid3").get(0).play();
+        });
+    }
+    $("#left").on("click", function() {
+        submitAndGetNext($("#vid1_mp4").attr("src"),$("#vid2_mp4").attr("src"),$("#vid3_mp4").attr("src"),"vid2");
+    });
+    $("#right").on("click", function() {
+        submitAndGetNext($("#vid1_mp4").attr("src"),$("#vid2_mp4").attr("src"),$("#vid3_mp4").attr("src"),"vid3");
+    });
+    $("#none").on("click", function() {
+        submitAndGetNext($("#vid1_mp4").attr("src"),$("#vid2_mp4").attr("src"),$("#vid3_mp4").attr("src"),"vid1");
+    });
+
+    // get initial set of videos
+    submitAndGetNext("","","","");
+
+    </script>
+</body>
+</html>
+
