@@ -33,6 +33,7 @@ html,body {
     border-radius: 5px;
     font-size: 150%;
     text-align: center;
+    padding-bottom:5px;
 
 }
 
@@ -86,21 +87,27 @@ button {
             </video>
         </div>
         <div class="box" style="background:#00000000">
-            <button id="none">Not similar to any of these two</button>
+            <p>
+            <button id="both">Both are rather similar</button>
+            </p>
+            <p>
+            <button id="none">Both are quite different</button>
+            </p>
         </div>
     </div>
 
     <script>
-    $('video').hover(function toggleControls() {
-        if (this.hasAttribute("controls")) {
-            this.removeAttribute("controls")
-        } else {
+    $('video').on("mouseover", function showControls() {
             this.setAttribute("controls", "controls")
-        }
-    })
+    });
+
+    $('video').on("mouseleave", function hideControls() {
+            this.removeAttribute("controls");
+    });
+
 
     function submitAndGetNext(vid1, vid2, vid3, choice) {
-        $.getJSON("/submit", {vid1: vid1, vid2:vid2, vid3:vid3, choice:choice}, function(data) {
+        $.getJSON("/submit", {"vid1": vid1, "vid2":vid2, "vid3":vid3, "choice":choice}, function(data) {
 
             if ("goto" in data) {
                 window.location.href = data.goto;
@@ -129,6 +136,9 @@ button {
     });
     $("#none").on("click", function() {
         submitAndGetNext($("#vid1_mp4").attr("src"),$("#vid2_mp4").attr("src"),$("#vid3_mp4").attr("src"),"vid1");
+    });
+    $("#both").on("click", function() {
+        submitAndGetNext($("#vid1_mp4").attr("src"),$("#vid2_mp4").attr("src"),$("#vid3_mp4").attr("src"),"both");
     });
 
     // get initial set of videos

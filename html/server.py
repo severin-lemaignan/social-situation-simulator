@@ -26,7 +26,8 @@ def submit():
     if vid1 != "":
         vid2 = request.args["vid2"]
         vid3 = request.args["vid3"]
-        choice = request.args[request.args["choice"]]
+        choice = request.args["choice"]
+        choice = request.args[choice] if choice not in ["both"] else choice
 
         if session["vid_idx"] == 7 and choice != "vid3":
             print("attention check failed!")
@@ -46,6 +47,11 @@ def submit():
             print(f"Neither {vid2} or {vid3} are similar to {vid1}")
             results.append(
                 (session["id"], vid1, vid2, vid3, 0, session["attention_check"])
+            )
+        elif choice == "both":
+            print(f"Both {vid2} and {vid3} are similar to {vid1}")
+            results.append(
+                (session["id"], vid1, vid2, vid3, 2, session["attention_check"])
             )
         else:
             print("Error! invalid choice")
