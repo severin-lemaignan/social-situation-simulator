@@ -90,6 +90,15 @@ def submit():
 
 @app.route("/")
 def index():
+    if "prolific" not in session:
+        session["prolific"] = 0
+
+    return render_template("welcome.html")
+
+
+@app.route("/prolific")
+def prolific():
+    session["prolific"] = 1
     return render_template("welcome.html")
 
 
@@ -112,6 +121,7 @@ def choice():
 
 @app.route("/reset")
 def reset():
+    session["prolific"] = 0
     session["vid_idx"] = 0
     session["attention_check"] = 0
     return render_template("welcome.html")
@@ -119,7 +129,10 @@ def reset():
 
 @app.route("/end")
 def end():
-    return render_template("end.html")
+    if session["prolific"] == 1:
+        return render_template("end_prolific.html")
+    else:
+        return render_template("end.html")
 
 
 if __name__ == "__main__":
