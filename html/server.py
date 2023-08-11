@@ -29,7 +29,7 @@ def submit():
         choice = request.args["choice"]
         choice = request.args[choice] if choice not in ["both"] else choice
 
-        if session["vid_idx"] == 7 and choice != "vid3":
+        if session["vid_idx"] == 7 and choice != vid3:
             print("attention check failed!")
             session["attention_check"] = 1
 
@@ -129,10 +129,11 @@ def reset():
 
 @app.route("/end")
 def end():
-    if session["prolific"] == 1:
-        return render_template("end_prolific.html")
-    else:
-        return render_template("end.html")
+    return render_template(
+        "end.html",
+        prolific=(session["prolific"] == 1),
+        url=("/redirect" if session["attention_check"] == 0 else "/return"),
+    )
 
 
 if __name__ == "__main__":

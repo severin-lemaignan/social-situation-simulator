@@ -11,7 +11,11 @@
     <body style="text-align:center;padding:50px;">
         <h2>Thank you!</h2>
 
+        {% if prolific %}
+        <a href="{{ url }}">Click here to finish and return to Prolific</a>
+        {% else %}
         You can now close this page.
+        {% endif %}
     </body>
 </html>
 
